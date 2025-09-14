@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mywebsite-deployment
+  labels:
+    app: mywebsite
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mywebsite
+  template:
+    metadata:
+      labels:
+        app: mywebsite
+    spec:
+      containers:
+      - name: mywebsite-app
+        # IMPORTANT: Replace this placeholder with the actual path to your image in a
+        # container registry like Amazon ECR or Docker Hub.
+        # Example: 123456789012.dkr.ecr.us-east-1.amazonaws.com/mywebsite-app:latest
+        image: 704505749045.dkr.ecr.us-east-1.amazonaws.com/mywebsite:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
