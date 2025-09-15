@@ -1,0 +1,24 @@
+# your-kubernetes-repo/argocd-apps/my-website-app.yaml
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-website
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/liormilliger/mywebsite-k8s.git
+    targetRevision: main
+    path: charts/my-website
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: my-website
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
