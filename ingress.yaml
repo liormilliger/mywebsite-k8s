@@ -2,22 +2,16 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: mywebsite-ingress
-  annotations:
-    # --- IMPORTANT ---
-    # These annotations are specifically for the AWS Load Balancer Controller.
-    # You MUST have this controller installed in your EKS cluster for this Ingress to work.
-    kubernetes.io/ingress.class: "alb"
-    alb.ingress.kubernetes.io/scheme: internet-facing # Creates a public-facing load balancer
-    alb.ingress.kubernetes.io/target-type: ip
 spec:
+  ingressClassName: nginx
   rules:
-  - host: "liormilliger.com" # The domain name for your website
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: mywebsite-service # The service to send the traffic to
-            port:
-              number: 80 # The port on the service to target
+    - host: liormilliger.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: mywebsite-service
+                port:
+                  number: 80
