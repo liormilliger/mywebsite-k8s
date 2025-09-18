@@ -2,10 +2,16 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: mywebsite-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
   # You can add NGINX-specific annotations here if needed
 spec:
   # This tells Kubernetes to use the NGINX controller for this Ingress
   ingressClassName: nginx
+  tls:
+  - hosts:
+    - liormilliger.com # <-- Replace with your domain
+    secretName: my-cool-website-tls
   rules:
     - host: liormilliger.com
       http:
