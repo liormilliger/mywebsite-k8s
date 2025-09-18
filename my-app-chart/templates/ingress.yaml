@@ -2,7 +2,9 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: mywebsite-ingress
+  # You can add NGINX-specific annotations here if needed
 spec:
+  # This tells Kubernetes to use the NGINX controller for this Ingress
   ingressClassName: nginx
   rules:
     - host: liormilliger.com

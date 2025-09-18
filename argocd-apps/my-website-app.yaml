@@ -12,13 +12,13 @@ spec:
   source:
     repoURL: https://github.com/liormilliger/mywebsite-k8s.git
     targetRevision: main
-    path: charts/my-website
+    path: my-app-chart
   destination:
     server: https://kubernetes.default.svc
-    namespace: my-website
+    namespace: default
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+    # syncOptions:
+    #   - CreateNamespace=true
