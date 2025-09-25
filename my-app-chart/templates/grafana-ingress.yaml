@@ -1,0 +1,28 @@
+# # grafana-ingress.yaml
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: grafana-ingress
+#   namespace: monitoring # Important: Must be in the same namespace as Grafana
+#   annotations:
+#     # Use your existing ClusterIssuer for automatic TLS certs
+#     cert-manager.io/cluster-issuer: "letsencrypt-prod" # Or whatever you named your issuer
+#     # Instruct nginx-ingress to handle this
+#     kubernetes.io/ingress.class: "nginx"
+# spec:
+#   rules:
+#     - host: grafana.liormilliger.com # <-- Change this to your domain
+#       http:
+#         paths:
+#           - path: /
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 # This service is created by the Helm chart
+#                 name: prometheus-stack-grafana
+#                 port:
+#                   number: 80
+#   tls:
+#     - hosts:
+#         - grafana.liormilliger.com # <-- Change this again
+#       secretName: grafana-tls # Cert-manager will create this secret for you

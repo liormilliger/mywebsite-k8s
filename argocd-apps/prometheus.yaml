@@ -1,54 +1,54 @@
-# prometheus-application.yaml
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  # This is the name of the ArgoCD Application resource itself
-  name: prometheus-stack
-  # This application resource should live in the 'argocd' namespace
-  namespace: argocd
-spec:
-  project: default
-  source:
-    # This is the official repository for the kube-prometheus-stack chart
-    repoURL: https://prometheus-community.github.io/helm-charts
-    chart: kube-prometheus-stack
-    # It's always a good idea to pin the chart version
-    targetRevision: 58.1.0
-    helm:
-      # Here you can override the default chart values
-      values: |
-        # General configurations
-        grafana:
-          # We will expose Grafana via our own Ingress resource later
-          ingress:
-            enabled: false
-          # Example of setting the admin password via values.
-          # For production, it's better to use a secret.
-          adminPassword: "YourSecurePassword"
+# # prometheus-application.yaml
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   # This is the name of the ArgoCD Application resource itself
+#   name: prometheus-stack
+#   # This application resource should live in the 'argocd' namespace
+#   namespace: argocd
+# spec:
+#   project: default
+#   source:
+#     # This is the official repository for the kube-prometheus-stack chart
+#     repoURL: https://prometheus-community.github.io/helm-charts
+#     chart: kube-prometheus-stack
+#     # It's always a good idea to pin the chart version
+#     targetRevision: 58.1.0
+#     helm:
+#       # Here you can override the default chart values
+#       values: |
+#         # General configurations
+#         grafana:
+#           # We will expose Grafana via our own Ingress resource later
+#           ingress:
+#             enabled: false
+#           # Example of setting the admin password via values.
+#           # For production, it's better to use a secret.
+#           adminPassword: "YourSecurePassword"
 
-        prometheus:
-          prometheusSpec:
-            # Set retention time for Prometheus data
-            retention: 10d
-            # Disable persistence for a quick start. For production, enable it.
-            storageSpec: {}
-            #   volumeClaimTemplate:
-            #     spec:
-            #       storageClassName: gp2 # or your preferred storage class
-            #       accessModes: ["ReadWriteOnce"]
-            #       resources:
-            #         requests:
-            #           storage: 50Gi
+#         prometheus:
+#           prometheusSpec:
+#             # Set retention time for Prometheus data
+#             retention: 10d
+#             # Disable persistence for a quick start. For production, enable it.
+#             storageSpec: {}
+#             #   volumeClaimTemplate:
+#             #     spec:
+#             #       storageClassName: gp2 # or your preferred storage class
+#             #       accessModes: ["ReadWriteOnce"]
+#             #       resources:
+#             #         requests:
+#             #           storage: 50Gi
 
-  destination:
-    # Deploy to the same cluster where ArgoCD is running
-    server: 'https://kubernetes.default.svc'
-    # This is the namespace where Prometheus, Grafana, etc. will be installed
-    namespace: monitoring
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    # This ensures that Kubernetes resources are created in the 'monitoring' namespace if it doesn't exist.
-    syncOptions:
-      - CreateNamespace=true
+#   destination:
+#     # Deploy to the same cluster where ArgoCD is running
+#     server: 'https://kubernetes.default.svc'
+#     # This is the namespace where Prometheus, Grafana, etc. will be installed
+#     namespace: monitoring
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     # This ensures that Kubernetes resources are created in the 'monitoring' namespace if it doesn't exist.
+#     syncOptions:
+#       - CreateNamespace=true
