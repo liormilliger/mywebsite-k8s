@@ -1,4 +1,3 @@
-# prom-stack.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -9,17 +8,26 @@ spec:
   source:
     repoURL: https://prometheus-community.github.io/helm-charts
     chart: kube-prometheus-stack
-    # It's a good practice to pin the chart version for stable deployments
     targetRevision: 58.0.0 
+    helm:
+      # This is the key change
+      # It tells Helm to skip applying CRDs during the normal sync
+      skipCrds: true
   destination:
     server: https://kubernetes.default.svc
-    # This is the namespace where the stack will be installed
     namespace: monitoring 
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      # This tells ArgoCD to create the 'monitoring' namespace if it doesn't exist
       - CreateNamespace=true
-      
+      # This option prevents ArgoCD from adding the bloated annotation that causes the problem
+      - ApplyOutOfSyncOnly=true
+  
+  # This section tells ArgoCD to sync the CRDs in a special, earlier phase
+  ignoreDifferences:
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      jsonPointers:
+        - /metadata/annotations/kubectl.kubernetes.io~1last-applied-configuration

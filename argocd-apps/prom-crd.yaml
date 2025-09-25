@@ -1,0 +1,35 @@
+    # prom-crd-app.yaml
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      name: prometheus-stack-crds
+      namespace: argocd
+      # This annotation puts this app in the first wave
+      annotations:
+        argocd.argoproj.io/sync-wave: "-1"
+    spec:
+      project: default
+      source:
+        repoURL: https://prometheus-community.github.io/helm-charts
+        chart: kube-prometheus-stack
+        targetRevision: 58.0.0
+        helm:
+          # We ONLY want the CRDs from this chart instance
+          values: |
+            grafana:
+              enabled: false
+            alertmanager:
+              enabled: false
+            prometheus:
+              enabled: false
+            # ... disable all other sub-charts except CRDs
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: monitoring
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          
