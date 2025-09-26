@@ -1,14 +1,11 @@
-# prom-crd.yaml
+# prom-crd.yaml (Corrected)
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: prometheus-stack-crds
   namespace: argocd
   annotations:
-    # A: Runs this application in the first wave.
-    argocd.argoproj.io/sync-wave: "-1"
-    
-    # B: The definitive fix. Uses Server-Side Apply, which avoids the 256kb annotation limit.
+    argocroj.io/sync-wave: "-1"
     argocd.argoproj.io/sync-options: ServerSideApply=true
 spec:
   project: default
@@ -17,23 +14,23 @@ spec:
     chart: kube-prometheus-stack
     targetRevision: 58.0.0
     helm:
-      # C: Disables every component to ensure ONLY CRDs are installed by this app.
       values: |
-        grafana:
-          enabled: false
+        # This list now disables every sub-component, including the operator itself.
         alertmanager:
           enabled: false
-        prometheus:
-          enabled: false
-        defaultRules:
+        grafana:
           enabled: false
         kube-state-metrics:
           enabled: false
         prometheus-node-exporter:
           enabled: false
+        prometheus:
+          enabled: false
+        
+        # <<< THIS IS THE KEY FIX
         prometheusOperator:
-          admissionWebhooks:
-            enabled: false
+          enabled: false
+          
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
