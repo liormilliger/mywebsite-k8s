@@ -1,18 +1,17 @@
-# cluster-config/cluster-issuer.yaml
+# cluster-config/cluster-issuer.yaml (Corrected)
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-prod
 spec:
   acme:
-    # You must replace this with your own email address
     email: liormilliger@gmail.com
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
-      # This secret will be created in the cert-manager namespace to store the ACME account private key
       name: letsencrypt-prod-private-key
-    # Add a single solver that uses the NGINX Ingress controller to solve HTTP01 challenges
     solvers:
     - http01:
         ingress:
-          class: nginx
+          # <<< CHANGE THIS LINE
+          ingressClassName: nginx
+          
