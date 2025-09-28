@@ -1,6 +1,8 @@
+# helm-values/efk/kibana-values.yaml
+
 # Point Kibana to the Elasticsearch service
 elasticsearchHosts:
-  - "http://elasticsearch-master:9200"
+  - "http://elasticsearch-master:9200" # <-- Correct format is a list item
 
 # Configure Ingress to access the Kibana UI
 ingress:
@@ -12,7 +14,7 @@ ingress:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: kibana-tls # cert-manager will create this secret
+    - secretName: kibana-tls
       hosts:
         - kibana.liormilliger.com
   annotations:
