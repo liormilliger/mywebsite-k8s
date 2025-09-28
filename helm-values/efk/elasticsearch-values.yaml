@@ -1,0 +1,10 @@
+# A single-node cluster for development/portfolio purposes
+replicas: 1
+minimumMasterNodes: 1
+
+# Configure persistent storage using the 'gp3' StorageClass
+volumeClaimTemplate:
+  storageClassName: gp3
+  resources:
+    requests:
+      storage: 15Gi
