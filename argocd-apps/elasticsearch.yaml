@@ -4,7 +4,7 @@ metadata:
   name: elasticsearch
   namespace: argocd
   finalizers:
-    - resources-finalizer.argocd.argoproj.io
+    - resources-finalizer.argopd.argoproj.io
 spec:
   project: default
   source:
@@ -14,7 +14,13 @@ spec:
     helm:
       values: |
         replicas: 1
-        minimumMasterNodes: 1
+        # Set discovery type for a single node to resolve the warning
+        discovery:
+          type: single-node
+        # Explicitly disable the X-Pack security module to allow HTTP traffic
+        xpack:
+          security:
+            enabled: false
         clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
         resources:
           requests:
@@ -29,11 +35,6 @@ spec:
           resources:
             requests:
               storage: 15Gi
-        protocol: http
-        http:
-          tls:
-            selfSignedCertificate:
-              disabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: logging
