@@ -6,52 +6,24 @@ metadata:
   name: fluentbit
   namespace: argocd
   finalizers:
-    - resources-finalizer.argocd.argoproj.io
+    - resources-finalizer.argocd.argocd.io
 spec:
   project: default
-  source:
-    repoURL: 'https://fluent.github.io/helm-charts'
-    chart: fluent-bit
-    targetRevision: 0.45.0
-    helm:
-      releaseName: fluentbit
-      valuesObject:
-        # Correct key to inject environment variables into the main container
-        env:
-          - name: ELASTICSEARCH_USERNAME
-            valueFrom:
-              secretKeyRef:
-                name: elasticsearch-master-credentials
-                key: username
-          - name: ELASTICSEARCH_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: elasticsearch-master-credentials
-                key: password
+  sources:
+    # Source 1: The Helm Chart from the remote repository
+    - repoURL: 'https://fluent.github.io/helm-charts'
+      chart: fluent-bit
+      targetRevision: 0.45.0 # Or any other version you prefer
+      helm:
+        releaseName: fluentbit
+        valueFiles:
+          # Use the $values variable to reference the other source
+          - $values/helm-values/efk/fluentbit-values.yaml # 🚨 ADJUST PATH IF NEEDED
 
-        extraVolumes:
-          - name: elastic-certs
-            secret:
-              secretName: elasticsearch-master-certs
-        extraVolumeMounts:
-          - name: elastic-certs
-            mountPath: /fluent-bit/etc/certs/
-            readOnly: true
-        
-        config:
-          outputs: |
-            [OUTPUT]
-                Name            es
-                Match           *
-                Host            elasticsearch-master
-                Port            9200
-                Http_User       ${ELASTICSEARCH_USERNAME}
-                Http_Passwd     ${ELASTICSEARCH_PASSWORD}
-                TLS             On
-                TLS.CA_File     /fluent-bit/etc/certs/ca.crt
-                TLS.Verify      On
-                TLS.VHost       elasticsearch-master
-                Suppress_Type_Name On
+    # Source 2: Your Git repository containing the values file
+    - repoURL: 'https://github.com/liormilliger/mywebsite-k8s.git' # 🚨 YOUR REPO URL
+      targetRevision: HEAD
+      ref: values # This reference is used in the $values variable above
 
   destination:
     server: 'https://kubernetes.default.svc'
