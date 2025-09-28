@@ -5,13 +5,16 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  source:
-    repoURL: https://helm.elastic.co
-    chart: elasticsearch
-    targetRevision: 8.5.1 # Pinned version for stability
-    helm:
-      valueFiles:
-        - helm-values/efk/elasticsearch-values.yaml
+  sources:
+    - repoURL: https://helm.elastic.co
+      chart: elasticsearch
+      targetRevision: 8.5.1
+      helm:
+        valueFiles:
+          - $values/helm-values/efk/elasticsearch-values.yaml
+    - repoURL: 'https://github.com/liormilliger/mywebsite-k8s.git' # 🚨 REPLACE THIS URL
+      targetRevision: HEAD
+      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: observability

@@ -5,13 +5,20 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  source:
-    repoURL: https://helm.elastic.co
-    chart: kibana
-    targetRevision: 8.5.1 # Match the Elasticsearch version
-    helm:
-      valueFiles:
-        - helm-values/efk/kibana-values.yaml
+  # Use the 'sources' field for multiple sources
+  sources:
+    # Source 1: The Helm Chart from the remote repository
+    - repoURL: https://helm.elastic.co
+      chart: kibana
+      targetRevision: 8.5.1
+      helm:
+        valueFiles:
+          # Use the $values variable to reference the other source
+          - $values/helm-values/efk/kibana-values.yaml
+    # Source 2: Your Git repository containing the values file
+    - repoURL: 'https://github.com/liormilliger/mywebsite-k8s.git' # 🚨 REPLACE THIS URL
+      targetRevision: HEAD
+      ref: values # This reference is used in the $values variable above
   destination:
     server: https://kubernetes.default.svc
     namespace: observability
