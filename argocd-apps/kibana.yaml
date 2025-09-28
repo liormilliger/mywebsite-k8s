@@ -13,7 +13,15 @@ spec:
     targetRevision: 8.5.1
     helm:
       values: |
+        # This is the key fix:
+        # Disable the pre-install hook that tries to create a token for a secure Elasticsearch.
+        # This is necessary because we have security disabled on our Elasticsearch instance.
+        managedServiceAccount: false
+
+        # Continue to specify the HTTP connection details for Kibana itself.
         elasticsearchHosts: "http://elasticsearch-master.logging.svc.cluster.local:9200"
+
+        # Resource configuration remains the same.
         resources:
           requests:
             cpu: "100m"
@@ -21,11 +29,6 @@ spec:
           limits:
             cpu: "1000m"
             memory: "1Gi"
-        protocol: http
-        http:
-          tls:
-            selfSignedCertificate:
-              disabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: logging
