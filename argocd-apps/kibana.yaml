@@ -8,15 +8,24 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/liormilliger/mywebsite-k8s.git'
-    targetRevision: main
-    path: 'argocd-apps'
+    repoURL: https://helm.elastic.co
+    chart: kibana
+    targetRevision: 8.5.1
     helm:
-      valueFiles:
-        - helm-values/efk/kibana-values.yaml
-      chart: kibana
-      repoURL: https://helm.elastic.co
-      targetRevision: 8.5.1 # Pinning chart version
+      values: |
+        elasticsearchHosts: "http://elasticsearch-master.logging.svc.cluster.local:9200"
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "1Gi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+        protocol: http
+        http:
+          tls:
+            selfSignedCertificate:
+              disabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: logging
@@ -26,3 +35,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+

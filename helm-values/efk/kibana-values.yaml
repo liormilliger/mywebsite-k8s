@@ -1,50 +1,50 @@
-# helm-values/efk/kibana-values.yaml
-# Point Kibana to the Elasticsearch service in the 'logging' namespace
-elasticsearchHosts: "http://elasticsearch-master:9200"
+# # helm-values/efk/kibana-values.yaml
+# # Point Kibana to the Elasticsearch service in the 'logging' namespace
+# elasticsearchHosts: "http://elasticsearch-master:9200"
 
-replicas: 1
+# replicas: 1
 
-# Keep resource usage low
-resources:
-  requests:
-    cpu: "500m"
-    memory: "512Mi"
-  limits:
-    cpu: "1000m"
-    memory: "1Gi"
+# # Keep resource usage low
+# resources:
+#   requests:
+#     cpu: "500m"
+#     memory: "512Mi"
+#   limits:
+#     cpu: "1000m"
+#     memory: "1Gi"
 
-######################### EARLIER #########################
-# # Correctly structured 'elasticsearch' block
-# elasticsearch:
-#   hosts:
-#     - "https://elasticsearch-master:9200"
-#   ssl:
-#     certificateAuthorities: [ "/usr/share/kibana/config/certs/ca.crt" ]
+# ######################### EARLIER #########################
+# # # Correctly structured 'elasticsearch' block
+# # elasticsearch:
+# #   hosts:
+# #     - "https://elasticsearch-master:9200"
+# #   ssl:
+# #     certificateAuthorities: [ "/usr/share/kibana/config/certs/ca.crt" ]
 
-# # Configure Ingress to access the Kibana UI
-# ingress:
-#   enabled: true
-#   className: nginx
-#   hosts:
-#     - host: kibana.liormilliger.com
-#       paths:
-#         - path: /
-#           pathType: Prefix
-#   tls:
-#     - secretName: kibana-tls
-#       hosts:
-#         - kibana.liormilliger.com
-#   annotations:
-#     cert-manager.io/cluster-issuer: "letsencrypt-prod"
-#     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+# # # Configure Ingress to access the Kibana UI
+# # ingress:
+# #   enabled: true
+# #   className: nginx
+# #   hosts:
+# #     - host: kibana.liormilliger.com
+# #       paths:
+# #         - path: /
+# #           pathType: Prefix
+# #   tls:
+# #     - secretName: kibana-tls
+# #       hosts:
+# #         - kibana.liormilliger.com
+# #   annotations:
+# #     cert-manager.io/cluster-issuer: "letsencrypt-prod"
+# #     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 
-# # Volume mounts for the elasticsearch certificate
-# extraVolumes:
-#   - name: elastic-certs
-#     secret:
-#       secretName: elasticsearch-master-certs
+# # # Volume mounts for the elasticsearch certificate
+# # extraVolumes:
+# #   - name: elastic-certs
+# #     secret:
+# #       secretName: elasticsearch-master-certs
 
-# extraVolumeMounts:
-#   - name: elastic-certs
-#     mountPath: /usr/share/kibana/config/certs/
-#     readOnly: true
+# # extraVolumeMounts:
+# #   - name: elastic-certs
+# #     mountPath: /usr/share/kibana/config/certs/
+# #     readOnly: true

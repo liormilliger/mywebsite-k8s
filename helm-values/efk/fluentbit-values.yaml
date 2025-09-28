@@ -1,28 +1,28 @@
-# Values for Fluent Bit to collect logs and send to Elasticsearch
-config:
-  # This filter adds kubernetes metadata (pod name, namespace, labels, etc.) to the logs
-  filters: |
-    [FILTER]
-        Name                kubernetes
-        Match               kube.*
-        Kube_URL            https://kubernetes.default.svc:443
-        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
-        Kube_Tag_Prefix     kube.var.log.containers.
-        Merge_Log           On
-        Merge_Log_Key       log_processed
-        K8S-Logging.Parser  On
-        K8S-Logging.Exclude Off
+# # Values for Fluent Bit to collect logs and send to Elasticsearch
+# config:
+#   # This filter adds kubernetes metadata (pod name, namespace, labels, etc.) to the logs
+#   filters: |
+#     [FILTER]
+#         Name                kubernetes
+#         Match               kube.*
+#         Kube_URL            https://kubernetes.default.svc:443
+#         Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+#         Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
+#         Kube_Tag_Prefix     kube.var.log.containers.
+#         Merge_Log           On
+#         Merge_Log_Key       log_processed
+#         K8S-Logging.Parser  On
+#         K8S-Logging.Exclude Off
 
-  # This output sends all matched logs to our Elasticsearch instance
-  outputs: |
-    [OUTPUT]
-        Name            es
-        Match           *
-        Host            elasticsearch-master.logging.svc.cluster.local
-        Port            9200
-        Logstash_Format On
-        Retry_Limit     False
-        # Disable TLS as we configured Elasticsearch to use HTTP
-        tls             Off
-        tls.verify      Off
+#   # This output sends all matched logs to our Elasticsearch instance
+#   outputs: |
+#     [OUTPUT]
+#         Name            es
+#         Match           *
+#         Host            elasticsearch-master.logging.svc.cluster.local
+#         Port            9200
+#         Logstash_Format On
+#         Retry_Limit     False
+#         # Disable TLS as we configured Elasticsearch to use HTTP
+#         tls             Off
+#         tls.verify      Off

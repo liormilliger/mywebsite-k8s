@@ -8,15 +8,32 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/liormilliger/mywebsite-k8s.git'
-    targetRevision: main 
-    path: 'argocd-apps' 
+    repoURL: https://helm.elastic.co
+    chart: elasticsearch
+    targetRevision: 8.5.1
     helm:
-      valueFiles:
-        - helm-values/efk/elasticsearch-values.yaml
-      chart: elasticsearch
-      repoURL: https://helm.elastic.co
-      targetRevision: 8.5.1 # Pinning chart version
+      values: |
+        replicas: 1
+        minimumMasterNodes: 1
+        clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "2Gi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+        volumeClaimTemplate:
+          accessModes: [ "ReadWriteOnce" ]
+          storageClassName: "gp2"
+          resources:
+            requests:
+              storage: 15Gi
+        protocol: http
+        http:
+          tls:
+            selfSignedCertificate:
+              disabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: logging
