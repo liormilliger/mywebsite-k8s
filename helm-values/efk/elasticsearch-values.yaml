@@ -17,4 +17,7 @@ resources:
   limits:
     cpu: "1"
     memory: "4Gi"
+extraEnvs:
+  - name: discovery.type
+    value: single-node
 # --------------------------------------------------------------------
