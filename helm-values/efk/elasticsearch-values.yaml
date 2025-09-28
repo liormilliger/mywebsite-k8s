@@ -9,7 +9,11 @@ volumeClaimTemplate:
     requests:
       storage: 15Gi
 
+# Set Java heap size to 2g (2 gigabytes)
 esJavaOpts: "-Xms2g -Xmx2g"
+
+# Set pod resource requests and limits. The memory limit must be
+# higher than the heap size to account for other processes.
 resources:
   requests:
     cpu: "500m"
@@ -17,7 +21,4 @@ resources:
   limits:
     cpu: "1"
     memory: "4Gi"
-extraEnvs:
-  - name: discovery.type
-    value: single-node
-# --------------------------------------------------------------------
+    
