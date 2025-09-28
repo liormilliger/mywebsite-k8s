@@ -1,22 +1,97 @@
+# argocd-apps/fluentbit.yaml
+
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: fluent-bit
+  name: fluentbit
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  sources:
-    - repoURL: https://fluent.github.io/helm-charts
-      chart: fluent-bit
-      targetRevision: 0.45.0
-      helm:
-        valueFiles:
-          - $values/helm-values/efk/fluentbit-values.yaml
-    - repoURL: 'https://github.com/liormilliger/mywebsite-k8s.git' # 🚨 REPLACE THIS URL
-      targetRevision: HEAD
-      ref: values
+  source:
+    repoURL: 'https://fluent.github.io/helm-charts'
+    chart: fluent-bit
+    targetRevision: 0.45.0 # Use a specific, recent version
+    helm:
+      releaseName: fluentbit
+      # IMPORTANT: This section configures Fluent Bit's output to Elasticsearch
+      valuesObject:
+        # Mount the elasticsearch CA cert secret into the fluent-bit pods
+        extraVolumes:
+          - name: elastic-certs
+            secret:
+              secretName: elasticsearch-master-certs
+        extraVolumeMounts:
+          - name: elastic-certs
+            mountPath: /fluent-bit/etc/certs/
+            readOnly: true
+
+        # Configure the standard Elasticsearch output plugin
+        config:
+          outputs: |
+            [OUTPUT]
+                Name            es
+                Match           *
+                Host            elasticsearch-master
+                Port            9200
+                TLS             On
+                TLS.CA_File     /fluent-bit/etc/certs/ca.crt
+                TLS.Verify      On
+                Suppress_Type_Name On
+
   destination:
-    server: https://kubernetes.default.svc
+    server: 'https://kubernetes.default.svc'
+    namespace: observability
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true# argocd-apps/fluentbit.yaml
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fluentbit
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://fluent.github.io/helm-charts'
+    chart: fluent-bit
+    targetRevision: 0.45.0 # Use a specific, recent version
+    helm:
+      releaseName: fluentbit
+      # IMPORTANT: This section configures Fluent Bit's output to Elasticsearch
+      valuesObject:
+        # Mount the elasticsearch CA cert secret into the fluent-bit pods
+        extraVolumes:
+          - name: elastic-certs
+            secret:
+              secretName: elasticsearch-master-certs
+        extraVolumeMounts:
+          - name: elastic-certs
+            mountPath: /fluent-bit/etc/certs/
+            readOnly: true
+
+        # Configure the standard Elasticsearch output plugin
+        config:
+          outputs: |
+            [OUTPUT]
+                Name            es
+                Match           *
+                Host            elasticsearch-master
+                Port            9200
+                TLS             On
+                TLS.CA_File     /fluent-bit/etc/certs/ca.crt
+                TLS.Verify      On
+                Suppress_Type_Name On
+
+  destination:
+    server: 'https://kubernetes.default.svc'
     namespace: observability
   syncPolicy:
     automated:
