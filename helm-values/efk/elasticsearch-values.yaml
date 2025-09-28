@@ -1,5 +1,5 @@
 # A single-node cluster for development/portfolio purposes
-replicas: 1
+replicas: 2
 minimumMasterNodes: 1
 
 # Configure persistent storage using the 'gp2' StorageClass
@@ -16,9 +16,8 @@ esJavaOpts: "-Xms2g -Xmx2g"
 # higher than the heap size to account for other processes.
 resources:
   requests:
-    cpu: "500m"
-    memory: "4Gi"
-  limits:
     cpu: "1"
     memory: "4Gi"
-    
+  limits:
+    cpu: "2"
+    memory: "4Gi"
