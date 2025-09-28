@@ -1,10 +1,11 @@
 # helm-values/efk/kibana-values.yaml
 
-# By nesting the configuration like this, we bypass the chart's
-# faulty template logic and write the value directly.
+# Correctly structured 'elasticsearch' block
 elasticsearch:
   hosts:
     - "https://elasticsearch-master:9200"
+  ssl:
+    certificateAuthorities: [ "/usr/share/kibana/config/certs/ca.crt" ]
 
 # Configure Ingress to access the Kibana UI
 ingress:
@@ -22,6 +23,8 @@ ingress:
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+
+# Volume mounts for the elasticsearch certificate
 extraVolumes:
   - name: elastic-certs
     secret:
@@ -31,7 +34,4 @@ extraVolumeMounts:
   - name: elastic-certs
     mountPath: /usr/share/kibana/config/certs/
     readOnly: true
-
-elasticsearch:
-  ssl:
-    certificateAuthorities: [ "/usr/share/kibana/config/certs/ca.crt" ]
+    
