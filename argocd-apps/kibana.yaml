@@ -4,7 +4,7 @@ metadata:
   name: kibana
   namespace: argocd
   finalizers:
-    - resources-finalizer.argocd.argoproj.io
+    - resources-finalizer.argocd.argocroj.io
 spec:
   project: default
   source:
@@ -13,13 +13,19 @@ spec:
     targetRevision: 8.5.1
     helm:
       values: |
-        # This is the key fix:
-        # Disable the pre-install hook that tries to create a token for a secure Elasticsearch.
-        # This is necessary because we have security disabled on our Elasticsearch instance.
-        managedServiceAccount: false
+        # Connect to Elasticsearch over HTTPS
+        elasticsearchHosts: "https://elasticsearch-master.logging.svc.cluster.local:9200"
 
-        # Continue to specify the HTTP connection details for Kibana itself.
-        elasticsearchHosts: "http://elasticsearch-master.logging.svc.cluster.local:9200"
+        # Provide the CA certificate to Kibana so it can trust our Elasticsearch instance.
+        # This references the secret automatically created by the Elasticsearch chart.
+        elasticsearchCertificateAuthorities:
+          - secretName: elasticsearch-master-http-ca
+
+        # Credentials for Kibana to connect to Elasticsearch will be stored in a secret
+        # that the pre-install job (which will now work) creates.
+        elasticsearchRef:
+          name: elasticsearch-master
+          namespace: logging
 
         # Resource configuration remains the same.
         resources:
@@ -38,4 +44,6 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      # # Add a sync-wave to ensure this only deploys after Elasticsearch is ready.
+      # - SyncWave="1"
 

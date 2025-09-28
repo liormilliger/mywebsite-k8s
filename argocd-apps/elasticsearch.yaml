@@ -2,9 +2,9 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: elasticsearch
-  namespace: argocd
+  namespace: argod
   finalizers:
-    - resources-finalizer.argopd.argoproj.io
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
@@ -14,14 +14,26 @@ spec:
     helm:
       values: |
         replicas: 1
-        # Set discovery type for a single node to resolve the warning
-        discovery:
-          type: single-node
-        # Explicitly disable the X-Pack security module to allow HTTP traffic
-        xpack:
-          security:
-            enabled: false
-        clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
+        # No longer need 'discovery.type' or 'xpack' overrides.
+        # We will use the chart's secure defaults.
+
+        # This section tells the chart to generate self-signed certs for HTTP traffic.
+        # It will create secrets to store these certificates.
+        protocol: https
+        http:
+          tls:
+            selfSignedCertificate:
+              disabled: false # Explicitly enable self-signed cert generation
+
+        # Storage configuration remains the same.
+        volumeClaimTemplate:
+          accessModes: [ "ReadWriteOnce" ]
+          storageClassName: "gp2"
+          resources:
+            requests:
+              storage: 15Gi
+
+        # Resource allocation remains the same.
         resources:
           requests:
             cpu: "100m"
@@ -29,12 +41,6 @@ spec:
           limits:
             cpu: "1000m"
             memory: "2Gi"
-        volumeClaimTemplate:
-          accessModes: [ "ReadWriteOnce" ]
-          storageClassName: "gp2"
-          resources:
-            requests:
-              storage: 15Gi
   destination:
     server: https://kubernetes.default.svc
     namespace: logging
@@ -44,3 +50,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+
