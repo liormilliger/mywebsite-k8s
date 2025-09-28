@@ -2,9 +2,19 @@
 replicas: 1
 minimumMasterNodes: 1
 
-# Configure persistent storage using the 'gp3' StorageClass
+# Configure persistent storage using the 'gp2' StorageClass
 volumeClaimTemplate:
   storageClassName: gp2
   resources:
     requests:
       storage: 15Gi
+
+esJavaOpts: "-Xms2g -Xmx2g"
+resources:
+  requests:
+    cpu: "500m"
+    memory: "4Gi"
+  limits:
+    cpu: "1"
+    memory: "4Gi"
+# --------------------------------------------------------------------
