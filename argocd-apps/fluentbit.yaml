@@ -1,37 +1,28 @@
-# argocd-apps/fluentbit.yaml
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: fluentbit
   namespace: argocd
   finalizers:
-    - resources-finalizer.argocd.argocd.io
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  sources:
-    # Source 1: The Helm Chart from the remote repository
-    - repoURL: 'https://fluent.github.io/helm-charts'
+  source:
+    repoURL: 'https://github.com/liormilliger/mywebsite-k8s.git'
+    targetRevision: main 
+    path: 'argocd-apps'
+    helm:
+      valueFiles:
+        - helm-values/efk/fluentbit-values.yaml
       chart: fluent-bit
-      targetRevision: 0.45.0 # Or any other version you prefer
-      helm:
-        releaseName: fluentbit
-        valueFiles:
-          # Use the $values variable to reference the other source
-          - $values/helm-values/efk/fluentbit-values.yaml # 🚨 ADJUST PATH IF NEEDED
-
-    # Source 2: Your Git repository containing the values file
-    - repoURL: 'https://github.com/liormilliger/mywebsite-k8s.git' # 🚨 YOUR REPO URL
-      targetRevision: HEAD
-      ref: values # This reference is used in the $values variable above
-
+      repoURL: https://fluent.github.io/helm-charts
+      targetRevision: 0.45.0 # Pinning chart version
   destination:
-    server: 'https://kubernetes.default.svc'
-    namespace: observability
+    server: https://kubernetes.default.svc
+    namespace: logging
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      

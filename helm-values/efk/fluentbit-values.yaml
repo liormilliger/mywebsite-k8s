@@ -1,46 +1,6 @@
-# This values.yaml file configures Fluent Bit to run as a DaemonSet,
-# collect container logs, enrich them with Kubernetes metadata, and
-# securely send them to an Elasticsearch service.
-
-# Inject ELASTICSEARCH_USERNAME and ELASTICSEARCH_PASSWORD as environment variables
-# from the secret created by the Elasticsearch Helm chart.
-env:
-  - name: ELASTICSEARCH_USERNAME
-    valueFrom:
-      secretKeyRef:
-        name: elasticsearch-master-credentials
-        key: username
-  - name: ELASTICSEARCH_PASSWORD
-    valueFrom:
-      secretKeyRef:
-        name: elasticsearch-master-credentials
-        key: password
-
-# Create a volume from the secret containing the Elasticsearch CA certificate.
-extraVolumes:
-  - name: elastic-certs
-    secret:
-      secretName: elasticsearch-master-certs
-
-# Mount the certificate volume into the Fluent Bit container so it can be referenced in the config.
-extraVolumeMounts:
-  - name: elastic-certs
-    mountPath: /fluent-bit/etc/certs/
-    readOnly: true
-
-# Main Fluent Bit configuration for inputs, filters, and outputs.
+# Values for Fluent Bit to collect logs and send to Elasticsearch
 config:
-  inputs: |
-    [INPUT]
-        Name              tail
-        Tag               kube.*
-        Path              /var/log/containers/*.log
-        Parser            docker
-        DB                /var/log/flb_kube.db
-        Mem_Buf_Limit     5MB
-        Skip_Long_Lines   On
-        Refresh_Interval  10
-
+  # This filter adds kubernetes metadata (pod name, namespace, labels, etc.) to the logs
   filters: |
     [FILTER]
         Name                kubernetes
@@ -54,21 +14,15 @@ config:
         K8S-Logging.Parser  On
         K8S-Logging.Exclude Off
 
+  # This output sends all matched logs to our Elasticsearch instance
   outputs: |
     [OUTPUT]
         Name            es
-        Match           kube.*
-        Host            elasticsearch-master
+        Match           *
+        Host            elasticsearch-master.logging.svc.cluster.local
         Port            9200
-        # These variables are expanded from the 'env' section above
-        Http_User       ${ELASTICSEARCH_USERNAME}
-        Http_Passwd     ${ELASTICSEARCH_PASSWORD}
-        # Enable TLS and configure verification
-        TLS             On
-        TLS.Verify      On
-        TLS.CA_File     /fluent-bit/etc/certs/ca.crt
-        # Standard settings for Elastic output
-        Suppress_Type_Name On
-        Replace_Dots    On
+        Logstash_Format On
         Retry_Limit     False
-        
+        # Disable TLS as we configured Elasticsearch to use HTTP
+        tls             Off
+        tls.verify      Off

@@ -3,29 +3,26 @@ kind: Application
 metadata:
   name: kibana
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  # Use the 'sources' field for multiple sources
-  sources:
-    # Source 1: The Helm Chart from the remote repository
-    - repoURL: https://helm.elastic.co
+  source:
+    repoURL: 'https://github.com/liormilliger/mywebsite-k8s.git'
+    targetRevision: main
+    path: 'argocd-apps'
+    helm:
+      valueFiles:
+        - helm-values/efk/kibana-values.yaml
       chart: kibana
-      targetRevision: 8.5.1
-      helm:
-        valueFiles:
-          # Use the $values variable to reference the other source
-          - $values/helm-values/efk/kibana-values.yaml
-    # Source 2: Your Git repository containing the values file
-    - repoURL: 'https://github.com/liormilliger/mywebsite-k8s.git' # 🚨 REPLACE THIS URL
-      targetRevision: HEAD
-      ref: values # This reference is used in the $values variable above
+      repoURL: https://helm.elastic.co
+      targetRevision: 8.5.1 # Pinning chart version
   destination:
     server: https://kubernetes.default.svc
-    namespace: observability
+    namespace: logging
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      
