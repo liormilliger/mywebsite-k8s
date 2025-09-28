@@ -1,9 +1,10 @@
 # helm-values/efk/kibana-values.yaml
 
-# Point Kibana to the Elasticsearch service
-server.host: "0"
-elasticsearchHosts:
-  - "http://elasticsearch-master:9200" # <-- Correct format is a list item
+# By nesting the configuration like this, we bypass the chart's
+# faulty template logic and write the value directly.
+elasticsearch:
+  hosts:
+    - "http://elasticsearch-master:9200"
 
 # Configure Ingress to access the Kibana UI
 ingress:
@@ -21,3 +22,4 @@ ingress:
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    
