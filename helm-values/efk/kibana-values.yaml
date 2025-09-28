@@ -1,10 +1,27 @@
 # helm-values/efk/kibana-values.yaml
 
-elasticsearchHosts:
-  - "https://elasticsearch-master:9200" # <-- IMPORTANT: Change to https
+# By nesting the configuration like this, we bypass the chart's
+# faulty template logic and write the value directly.
+elasticsearch:
+  hosts:
+    - "https://elasticsearch-master:9200"
 
-# Add this entire section to mount the certificate secret from Elasticsearch
-# and configure Kibana to use it.
+# Configure Ingress to access the Kibana UI
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: kibana.liormilliger.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: kibana-tls
+      hosts:
+        - kibana.liormilliger.com
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 extraVolumes:
   - name: elastic-certs
     secret:
