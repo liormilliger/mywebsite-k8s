@@ -13,7 +13,7 @@ spec:
     # vvv --- NEW REPO URL AND CHART --- vvv
     repoURL: https://charts.bitnami.com/bitnami
     chart: elasticsearch
-    targetRevision: 19.16.2 # A recent, stable version
+    targetRevision: 19.16.5 # A recent, stable version
     helm:
       values: |
         global:
@@ -23,18 +23,18 @@ spec:
           replicas: 1
           resources:
             requests:
-              cpu: "100m"
+              cpu: "500m"
               memory: "2Gi"
             limits:
               cpu: "1000m"
               memory: "2Gi"
         # Disable other node types for a minimal setup
         data:
-          replicas: 0
+          replicas: 1
         ingest:
-          replicas: 0
+          replicas: 1
         coordinating:
-          replicas: 0
+          replicas: 1
         # This is the magic part: Bitnami handles all the certificate
         # generation and SANs for you automatically.
         tls:
@@ -48,4 +48,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      
