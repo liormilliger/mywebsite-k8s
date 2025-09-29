@@ -19,7 +19,7 @@ spec:
         # Provide the CA certificate to Kibana so it can trust our Elasticsearch instance.
         # This references the secret automatically created by the Elasticsearch chart.
         elasticsearchCertificateAuthorities:
-          - secretName: elasticsearch-master-http-ca
+          - secretName: elasticsearch-master-certs
 
         # Credentials for Kibana to connect to Elasticsearch will be stored in a secret
         # that the pre-install job (which will now work) creates.

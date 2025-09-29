@@ -44,7 +44,7 @@ spec:
         extraVolumes:
           - name: es-ca
             secret:
-              secretName: elasticsearch-master-http-ca
+              secretName: elasticsearch-master-certs
         extraVolumeMounts:
           - name: es-ca
             mountPath: /fluent-bit/certs
