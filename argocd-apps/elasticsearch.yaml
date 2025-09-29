@@ -23,7 +23,15 @@ spec:
         http:
           tls:
             selfSignedCertificate:
-              disabled: false # Explicitly enable self-signed cert generation
+              disabled: false
+              # vvv ADD THESE LINES vvv
+              subjectAltNames:
+                - ip: 127.0.0.1
+                - dns: localhost
+                - dns: elasticsearch-master
+                - dns: elasticsearch-master.logging
+                - dns: elasticsearch-master.logging.svc
+                - dns: elasticsearch-master.logging.svc.cluster.local
 
         # Storage configuration remains the same.
         volumeClaimTemplate:
