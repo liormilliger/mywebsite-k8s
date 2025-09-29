@@ -4,32 +4,28 @@ metadata:
   name: kibana
   namespace: argocd
   annotations:
-     argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: "1"
   finalizers:
-    - resources-finalizer.argocd.argocroj.io
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: https://helm.elastic.co
+    # vvv --- NEW REPO URL AND CHART --- vvv
+    repoURL: https://charts.bitnami.com/bitnami
     chart: kibana
-    targetRevision: 8.11.1
+    targetRevision: 13.5.2 # A recent, compatible version
     helm:
       values: |
-        # Connect to Elasticsearch over HTTPS
-        elasticsearchHosts: "https://elasticsearch-master.logging.svc.cluster.local:9200"
+        # Use the service name from the Bitnami Elasticsearch chart
+        elasticsearch:
+          hosts:
+            - elasticsearch-master
+          port: 9200
+          tls:
+            enabled: true
+            # This tells Kibana to use the CA from the auto-generated secret
+            caSecretName: elasticsearch-master-certs
 
-        # Provide the CA certificate to Kibana so it can trust our Elasticsearch instance.
-        # This references the secret automatically created by the Elasticsearch chart.
-        elasticsearchCertificateAuthorities:
-          - secretName: elasticsearch-master-certs
-
-        # Credentials for Kibana to connect to Elasticsearch will be stored in a secret
-        # that the pre-install job (which will now work) creates.
-        elasticsearchRef:
-          name: elasticsearch-master
-          namespace: logging
-
-        # Resource configuration remains the same.
         resources:
           requests:
             cpu: "100m"
@@ -46,6 +42,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      # # Add a sync-wave to ensure this only deploys after Elasticsearch is ready.
-      # - SyncWave="1"
-
