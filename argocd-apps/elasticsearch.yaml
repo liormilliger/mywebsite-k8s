@@ -13,7 +13,7 @@ spec:
     # vvv --- NEW REPO URL AND CHART --- vvv
     repoURL: https://charts.bitnami.com/bitnami
     chart: elasticsearch
-    targetRevision: 20.0.0
+    targetRevision: 19.14.1
     helm:
       values: |
         global:
