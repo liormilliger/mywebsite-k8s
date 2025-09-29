@@ -4,8 +4,8 @@ metadata:
   name: fluent-bit
   namespace: argocd
   annotations:
-    argocroj.io/sync-wave: "1"
-  finalizers:
+    argocd.argoproj.io/sync-wave: "1"
+    finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
