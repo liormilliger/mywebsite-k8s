@@ -13,7 +13,7 @@ spec:
     # vvv --- NEW REPO URL AND CHART --- vvv
     repoURL: https://charts.bitnami.com/bitnami
     chart: kibana
-    targetRevision: 13.5.2 # A recent, compatible version
+    targetRevision: 12.1.10 # A recent, compatible version
     helm:
       values: |
         # Use the service name from the Bitnami Elasticsearch chart
