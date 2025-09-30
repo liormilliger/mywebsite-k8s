@@ -1,0 +1,70 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: elastic-stack
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://helm.elastic.co
+    chart: eck-operator
+    targetRevision: 2.11.1 # A recent, stable version of the ECK Operator chart
+    helm:
+      values: |
+        # This section installs the ECK Operator and also creates the Elasticsearch and Kibana resources.
+        extraObjects:
+          - apiVersion: elasticsearch.k8s.elastic.co/v1
+            kind: Elasticsearch
+            metadata:
+              name: elasticsearch-cluster
+              namespace: logging
+            spec:
+              version: 8.11.1 # Specify the desired Elasticsearch version
+              nodeSets:
+              - name: default
+                count: 1 # A single-node cluster, as in your original file
+                config:
+                  node.store.allow_mmap: false
+                podTemplate:
+                  spec:
+                    containers:
+                    - name: elasticsearch
+                      resources:
+                        requests:
+                          cpu: "500m"
+                          memory: "2Gi"
+                        limits:
+                          cpu: "1"
+                          memory: "2Gi"
+          - apiVersion: kibana.k8s.elastic.co/v1
+            kind: Kibana
+            metadata:
+              name: kibana-instance
+              namespace: logging
+            spec:
+              version: 8.11.1 # Specify the desired Kibana version
+              elasticsearchRef:
+                name: "elasticsearch-cluster" # Links Kibana to the Elasticsearch cluster above
+              podTemplate:
+                spec:
+                  containers:
+                  - name: kibana
+                    resources:
+                      requests:
+                        cpu: "200m"
+                        memory: "1Gi"
+                      limits:
+                        cpu: "1"
+                        memory: "1Gi"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: logging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      
