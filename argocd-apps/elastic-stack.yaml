@@ -1,20 +1,22 @@
+# Unified elastic-stack.yaml
+
+# Application 1: Deploys the ECK Operator.
+# Sync-wave "0" ensures this runs first.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: elastic-stack
   namespace: argocd
-  # annotations:
-  #   argocd.argoproj.io/sync-wave: "0"
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
   finalizers:
-    - resources-finalizer.argocd.argoproj.io
+    - resources-finalizer.argocd.argroj.io
 spec:
   project: default
   source:
     repoURL: https://helm.elastic.co
     chart: eck-operator
     targetRevision: 2.11.1
-    helm:
-      values: ""
   destination:
     server: https://kubernetes.default.svc
     namespace: logging
@@ -24,3 +26,36 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+---
+# Application 2: Deploys the Elasticsearch and Kibana resources.
+# Sync-wave "1" ensures this runs AFTER the operator is ready.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: elastic-resources
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  finalizers:
+    - resources-finalizer.argocd.argroj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/liormilliger/mywebsite-k8s.git
+    path: argocd-apps
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: logging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    # This retry policy is highly recommended to prevent sync failures
+    # due to the small delay for the operator's CRDs to become ready.
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
