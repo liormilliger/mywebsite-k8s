@@ -17,6 +17,8 @@ spec:
     repoURL: https://helm.elastic.co
     chart: eck-operator
     targetRevision: 2.11.1
+    directory:
+      exclude: 'elastic-resources.yaml'
     helm:
       values: |
         webhook:
