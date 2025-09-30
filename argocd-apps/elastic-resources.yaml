@@ -1,20 +1,20 @@
+# elastic-resources.yaml (NEW FILE)
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: elastic-stack
+  name: elastic-resources
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "0"
+    # This will be deployed in the second wave, AFTER the operator
+    argocd.argoproj.io/sync-wave: "1"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: https://helm.elastic.co
-    chart: eck-operator
-    targetRevision: 2.11.1
-    helm:
-      values: ""
+    repoURL: https://github.com/liormilliger/mywebsite-k8s.git
+    path: argocd-apps
+    targetRevision: HEAD
   destination:
     server: https://kubernetes.default.svc
     namespace: logging
@@ -22,5 +22,3 @@ spec:
     automated:
       prune: true
       selfHeal: true
-    syncOptions:
-      - CreateNamespace=true

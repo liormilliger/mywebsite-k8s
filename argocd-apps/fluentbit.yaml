@@ -39,14 +39,14 @@ spec:
           - name: ELASTIC_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: elasticsearch-master-credentials
+                name: elasticsearch-cluster-credentials
                 key: password
 
         # Mount the secret containing the self-signed CA certificate
         extraVolumes:
           - name: es-ca
             secret:
-              secretName: elasticsearch-master-certs
+              secretName: elasticsearch-cluster-certs
         extraVolumeMounts:
           - name: es-ca
             mountPath: /fluent-bit/certs
