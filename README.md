@@ -1,4 +1,4 @@
-# My Personal Website & Portfolio - Kubernetes Configuration
+# My Personal Website Portfolio - K8s Configuration
 
 This repository contains the Kubernetes configuration files for my personal portfolio website, managed through Helm charts and deployed via an ArgoCD app-of-apps pattern.
 
