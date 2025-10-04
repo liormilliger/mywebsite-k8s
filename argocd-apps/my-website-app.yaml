@@ -11,7 +11,7 @@ spec:
   project: default
   source:
     repoURL: git@github.com:liormilliger/mywebsite-k8s.git
-    targetRevision: main
+    targetRevision: database
     path: my-app-chart
   destination:
     server: https://kubernetes.default.svc
