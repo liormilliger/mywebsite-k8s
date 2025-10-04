@@ -1,3 +1,5 @@
+# /my-app-chart/templates/app-deployment.yaml
+# UPDATED: Added 'env' section to inject database connection details.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -20,3 +22,21 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
+        env:
+        - name: POSTGRES_HOST
+          value: "postgres-db-service"
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: POSTGRES_DB
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: postgres-password

@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: postgres-servicemonitor
+  labels:
+    # This label allows the Prometheus instance to discover this monitor.
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      # This must match the label on the postgres-db-service.
+      app: postgres-db
+  namespaceSelector:
+    matchNames:
+      - default # Assuming you are deploying in the default namespace
+  endpoints:
+  - port: metrics # This must match the NAME of the metrics port in the service.
+    path: /metrics
+    interval: 3s

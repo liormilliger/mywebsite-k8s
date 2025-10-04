@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-db
+spec:
+  serviceName: "postgres-db-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-db
+  template:
+    metadata:
+      labels:
+        app: postgres-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:13
+        ports:
+        - containerPort: 5432
+          name: postgres
+        envFrom:
+        - configMapRef:
+            name: postgres-config # Loads user and db name from ConfigMap
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret # Loads password from Secret
+              key: postgres-password
+        - name: PGDATA # Specifies the directory for data
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+      # --- Sidecar container for Prometheus Metrics ---
+      # This container runs a PostgreSQL exporter that Prometheus can scrape.
+      - name: postgres-exporter
+        image: wrouesnel/postgres_exporter:v0.10.0
+        ports:
+        - containerPort: 9187
+          name: metrics
+        env:
+        # The exporter needs to connect to the database.
+        # It connects to 'localhost' because it's in the same pod as the postgres container.
+        - name: DATA_SOURCE_NAME
+          value: "postgresql://admin@localhost:5432/mywebsite?sslmode=disable"
+        # We pass the password to the exporter via an environment variable.
+        - name: PG_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: postgres-password
+  # This template defines the PersistentVolume that will be created for your database.
+  # Your data will be stored here, ensuring it persists even if the pod restarts.
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 4Gi # Adjust storage size as needed
