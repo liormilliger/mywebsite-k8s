@@ -35,7 +35,7 @@ spec:
         - name: postgres-storage
           mountPath: /var/lib/postgresql/data
       - name: postgres-exporter
-        image: quay.io/prometheus-community/postgres_exporter:v0.15.0
+        image: bitnami/postgres-exporter:latest
         ports:
         - containerPort: 9187
           name: metrics
