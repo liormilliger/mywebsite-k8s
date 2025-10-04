@@ -52,7 +52,7 @@ spec:
       name: postgres-storage
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: gp2 # ADDED: This tells the PVC which StorageClass to use
+      storageClassName: gp3
       resources:
         requests:
-          storage: 4Gi
+          storage: 8Gi
