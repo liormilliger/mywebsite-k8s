@@ -29,19 +29,18 @@ spec:
             secretKeyRef:
               name: postgres-secret
               key: postgres-password
-        - name: PGDATA
-          value: /var/lib/postgresql/data/pgdata
         volumeMounts:
         - name: postgres-storage
           mountPath: /var/lib/postgresql/data
       - name: postgres-exporter
-        image: wrouesnel/postgres_exporter:v0.10.0
+        image: prometheus-community/postgres_exporter:v0.15.0
         ports:
         - containerPort: 9187
           name: metrics
         env:
+        # NOTE: You may need to adjust the DATA_SOURCE_NAME if your username or database name is different.
         - name: DATA_SOURCE_NAME
-          value: "postgresql://admin@localhost:5432/mywebsite?sslmode=disable"
+          value: "postgresql://admin@localhost:5432/postgres?sslmode=disable"
         - name: PG_PASSWORD
           valueFrom:
             secretKeyRef:
