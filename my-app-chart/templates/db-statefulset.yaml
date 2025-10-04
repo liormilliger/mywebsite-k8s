@@ -1,3 +1,4 @@
+# db-statefulset-updated.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -33,6 +34,12 @@ spec:
         volumeMounts:
         - name: postgres-storage
           mountPath: /var/lib/postgresql/data
+        - name: init-db-script
+          mountPath: /docker-entrypoint-initdb.d
+      volumes:
+      - name: init-db-script
+        configMap:
+          name: postgres-init-script
   volumeClaimTemplates:
   - metadata:
       name: postgres-storage
