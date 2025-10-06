@@ -10,7 +10,12 @@ spec:
   source:
     repoURL: https://kubernetes.github.io/ingress-nginx
     chart: ingress-nginx
-    targetRevision: 4.10.0 # Pinning a specific version is good practice
+    targetRevision: 4.10.0
+    helm:
+      values: |
+        controller:
+          service:
+            externalTrafficPolicy: Local
   destination:
     server: https://kubernetes.default.svc
     namespace: ingress-nginx
