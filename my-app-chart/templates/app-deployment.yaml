@@ -7,7 +7,7 @@ metadata:
   labels:
     app: mywebsite
 spec:
-  replicas: 1
+  replicas: {{ .Values.app.replicaCount }}
   selector:
     matchLabels:
       app: mywebsite
@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: mywebsite-app
-        image: 704505749045.dkr.ecr.us-east-1.amazonaws.com/mywebsite:latest
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
