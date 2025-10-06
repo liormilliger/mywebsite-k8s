@@ -4,20 +4,19 @@ metadata:
   name: mywebsite-ingress
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
-  # You can add NGINX-specific annotations here if needed
+    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
 spec:
-  # This tells Kubernetes to use the NGINX controller for this Ingress
   ingressClassName: nginx
   tls:
-  - hosts:
-    - liormilliger.com # <-- Replace with your domain
-    secretName: my-cool-website-tls
+    - hosts:
+        - liormilliger.com
+      secretName: my-cool-website-tls
   rules:
     - host: liormilliger.com
       http:
         paths:
           - pathType: Prefix
-            path: "/"
+            path: /
             backend:
               service:
                 name: mywebsite-service
