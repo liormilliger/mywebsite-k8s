@@ -1,7 +1,10 @@
 controller:
   config:
-    use-proxy-protocol: "true"
+    use-forwarded-headers: "true"
+    compute-full-forwarded-for: "true"
+    use-proxy-protocol: "false"   # disable proxy protocol unless using NLB
   service:
-    externalTrafficPolicy: Local
     annotations:
-      service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: 'true'
+      service.beta.kubernetes.io/aws-load-balancer-type: "elb"
+    externalTrafficPolicy: Local
+    
