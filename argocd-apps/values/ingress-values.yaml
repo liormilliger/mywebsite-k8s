@@ -1,0 +1,7 @@
+controller:
+  config:
+    use-proxy-protocol: "true"
+  service:
+    externalTrafficPolicy: Local
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: 'true'
