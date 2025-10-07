@@ -12,14 +12,14 @@ spec:
     chart: ingress-nginx
     targetRevision: 4.10.0
   helm:
-      values: |
-        controller:
-          config:
-            use-proxy-protocol: "true"
-          service:
-            externalTrafficPolicy: Local
-            annotations:
-              service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: 'true'
+    values: |
+      controller:
+        config:
+          use-proxy-protocol: "true"
+        service:
+          externalTrafficPolicy: Local
+          annotations:
+            service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: 'true'
   destination:
     server: https://kubernetes.default.svc
     namespace: ingress-nginx
