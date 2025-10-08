@@ -3,11 +3,11 @@ kind: Service
 metadata:
   name: postgres-db-service
   labels:
-    app: postgres-db # Label for the ServiceMonitor to find this service
+    app: postgres-db
 spec:
   type: ClusterIP
   selector:
-    app: postgres-db # Selects the pod created by the StatefulSet
+    app: postgres-db
   ports:
     - name: postgres
       protocol: TCP

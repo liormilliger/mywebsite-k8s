@@ -10,7 +10,6 @@ spec:
     chart: kube-prometheus-stack
     targetRevision: 58.0.0 
     helm:
-      # This is correct. It tells Helm not to install CRDs with this application.
       skipCrds: true
   destination:
     server: https://kubernetes.default.svc
@@ -20,6 +19,4 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
-      # You can remove ApplyOutOfSyncOnly from here as it's not needed for this part.
-      
+      - CreateNamespace=true      

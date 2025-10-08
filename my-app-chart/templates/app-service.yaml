@@ -7,13 +7,13 @@ kind: Service
 metadata:
   name: mywebsite-service
   labels:
-    app: mywebsite # Ensure this label matches the ServiceMonitor selector
+    app: mywebsite
 spec:
   type: ClusterIP
   selector:
     app: mywebsite
   ports:
-    - name: web # This name is required by your existing ServiceMonitor (prometheus-stack.yaml)
+    - name: web
       protocol: TCP
       port: 80
       targetPort: 5000

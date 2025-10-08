@@ -1,5 +1,3 @@
-# /my-app-chart/templates/app-deployment.yaml
-# UPDATED: Added 'env' section to inject database connection details.
 apiVersion: apps/v1
 kind: Deployment
 metadata:

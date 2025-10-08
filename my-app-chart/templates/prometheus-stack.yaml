@@ -1,27 +1,19 @@
-# servicemonitor.yaml
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: mywebsite-servicemonitor
-  # Deploy this ServiceMonitor in the SAME namespace as your application
   namespace: default 
   labels:
-    # IMPORTANT: This label tells the Prometheus instance from the stack to discover this ServiceMonitor.
-    # By default, it looks for 'release: prometheus'.
     release: prometheus 
 spec:
-  # This section selects the Service(s) to monitor.
   selector:
     matchLabels:
-      # This MUST match the label on your application's Service.
       app: mywebsite 
-  # This tells the ServiceMonitor to look for the Service in the 'default' namespace.
   namespaceSelector:
     matchNames:
       - default
-  # This section defines the endpoint to scrape on the selected Service.
   endpoints:
-    - port: web # This must match the NAME of the port in your Service definition.
-      path: /metrics # The path where your app exposes Prometheus metrics.
-      interval: 15s # How frequently to scrape metrics.
+    - port: web
+      path: /metrics
+      interval: 15s
       
