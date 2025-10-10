@@ -1,24 +1,24 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: mywebsite-ingress
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
-spec:
-  ingressClassName: nginx
-  tls:
-    - hosts:
-        - liormilliger.com
-      secretName: my-cool-website-tls
-  rules:
-    - host: liormilliger.com
-      http:
-        paths:
-          - pathType: Prefix
-            path: /
-            backend:
-              service:
-                name: mywebsite-service
-                port:
-                  number: 80
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: mywebsite-ingress
+#   annotations:
+#     cert-manager.io/cluster-issuer: "letsencrypt-prod"
+#     nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+# spec:
+#   ingressClassName: nginx
+#   tls:
+#     - hosts:
+#         - liormilliger.com
+#       secretName: my-cool-website-tls
+#   rules:
+#     - host: liormilliger.com
+#       http:
+#         paths:
+#           - pathType: Prefix
+#             path: /
+#             backend:
+#               service:
+#                 name: mywebsite-service
+#                 port:
+#                   number: 80
