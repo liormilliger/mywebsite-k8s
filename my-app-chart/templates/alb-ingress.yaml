@@ -25,3 +25,13 @@ spec:
                 name: mywebsite-service
                 port:
                   number: 80
+    - host: grafana.liormilliger.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: prometheus-stack-grafana
+                port:
+                  number: 80
