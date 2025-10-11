@@ -13,7 +13,7 @@ spec:
   tls:
     - hosts:
         - liormilliger.com
-      secretName: my-website-tls
+      secretName: mywebsite-cert
   rules:
     - host: liormilliger.com
       http:
