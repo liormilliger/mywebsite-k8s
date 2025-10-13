@@ -17,9 +17,8 @@ spec:
         serviceAccount:
           create: true
           name: aws-load-balancer-controller
-          # You must add the EKS IAM role annotation here
           annotations:
-            eks.amazonaws.com/role-arn: arn:aws:iam::704505749045:role/liorm-webapp-cluster-alb-controller-role
+            eks.amazonaws.com/role-arn: arn:aws:iam::704505749045:role/liorm-webapp-cluster-alb-role
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
