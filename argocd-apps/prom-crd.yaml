@@ -18,9 +18,9 @@ spec:
           enabled: false
         grafana:
           enabled: false
-        kube-state-metrics:
+        kubeStateMetrics:
           enabled: false
-        prometheus-node-exporter:
+        prometheusNodeExporter:
           enabled: false
         prometheus:
           enabled: false
