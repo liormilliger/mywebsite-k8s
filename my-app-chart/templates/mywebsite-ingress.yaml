@@ -1,9 +1,9 @@
-# grafana-ingress.yaml
+# mywebsite-ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: grafana-ingress-alb
-  namespace: monitoring
+  name: mywebsite-ingress-alb
+  namespace: default
   annotations:
     alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:us-east-1:704505749045:certificate/e1c3c46a-e125-4e8c-8ec8-be46addfe518"
     kubernetes.io/ingress.class: "alb"
@@ -14,13 +14,13 @@ metadata:
 spec:
   ingressClassName: alb
   rules:
-    - host: grafana.liormilliger.com
+    - host: liormilliger.com
       http:
         paths:
           - pathType: Prefix
             path: /
             backend:
               service:
-                name: prometheus-stack-grafana
+                name: mywebsite-service
                 port:
                   number: 80
