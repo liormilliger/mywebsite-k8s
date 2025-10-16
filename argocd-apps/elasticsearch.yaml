@@ -17,8 +17,6 @@ spec:
         # For production, you would increase replicas and configure persistence appropriately.
         replicas: 1
         minimumMasterNodes: 1
-
-        # Requesting resources is crucial for stability.
         resources:
           requests:
             cpu: "1"
@@ -27,10 +25,10 @@ spec:
             cpu: "2"
             memory: "2Gi"
         
-        # Requires a default StorageClass in your EKS cluster for persistence.
         persistence:
           enabled: true
           size: "20Gi"
+          storageClassName: "gp3"
 
   destination:
     server: https://kubernetes.default.svc
