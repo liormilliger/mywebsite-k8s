@@ -13,10 +13,7 @@ spec:
     targetRevision: 8.5.1
     helm:
       values: |
-        # This tells Kibana how to connect to the Elasticsearch service.
-        # The service name 'elasticsearch-master' is the default created by the official Helm chart.
-        elasticsearchHosts: ["http://elasticsearch-master.logging.svc:9200"]
-
+        elasticsearchHosts: "http://elasticsearch-master.logging.svc:9200"
         resources:
           requests:
             cpu: "500m"
@@ -33,3 +30,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+
