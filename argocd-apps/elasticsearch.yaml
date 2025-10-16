@@ -4,7 +4,7 @@ metadata:
   name: elasticsearch
   namespace: argocd
   finalizers:
-    - resources-finalizer.argocd.argocroj.io
+    - resources-finalizer.argocd.argroj.io
 spec:
   project: default
   source:
@@ -13,22 +13,21 @@ spec:
     targetRevision: 8.5.1
     helm:
       values: |
-        # This deploys a single-node Elasticsearch cluster suitable for testing or small workloads.
-        # For production, you would increase replicas and configure persistence appropriately.
         replicas: 1
-        minimumMasterNodes: 1
-        resources:
-          requests:
-            cpu: "1"
-            memory: "2Gi"
-          limits:
-            cpu: "2"
-            memory: "2Gi"
-        
-        persistence:
-          enabled: true
-          size: "20Gi"
-          storageClassName: "gp3"
+        minimumMasterNodes: 1        
+        master:
+          resources:
+            requests:
+              cpu: "1"
+              memory: "2Gi"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+          
+          persistence:
+            enabled: true
+            size: "20Gi"
+            storageClassName: "gp3"
 
   destination:
     server: https://kubernetes.default.svc
