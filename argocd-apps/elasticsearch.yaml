@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: elasticsearch
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argocroj.io
+spec:
+  project: default
+  source:
+    repoURL: https://helm.elastic.co
+    chart: elasticsearch
+    targetRevision: 8.5.1
+    helm:
+      values: |
+        # This deploys a single-node Elasticsearch cluster suitable for testing or small workloads.
+        # For production, you would increase replicas and configure persistence appropriately.
+        replicas: 1
+        minimumMasterNodes: 1
+
+        # Requesting resources is crucial for stability.
+        resources:
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+          limits:
+            cpu: "2"
+            memory: "2Gi"
+        
+        # Requires a default StorageClass in your EKS cluster for persistence.
+        persistence:
+          enabled: true
+          size: "20Gi"
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: logging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
