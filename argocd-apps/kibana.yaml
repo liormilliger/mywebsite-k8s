@@ -13,7 +13,7 @@ spec:
     targetRevision: 8.5.1
     helm:
       values: |
-        elasticsearchHosts: "http://elasticsearch-master.logging.svc:9200"
+        elasticsearchHosts: "https://elasticsearch-master.logging.svc:9200"
         resources:
           requests:
             cpu: "500m"

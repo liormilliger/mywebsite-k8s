@@ -2,9 +2,9 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: elasticsearch
-  namespace: argocd
+  namespace: argopd
   finalizers:
-    - resources-finalizer.argocd.argroj.io
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
@@ -13,21 +13,31 @@ spec:
     targetRevision: 8.5.1
     helm:
       values: |
-        replicas: 1
-        minimumMasterNodes: 1        
-        master:
-          resources:
-            requests:
-              cpu: "1"
-              memory: "2Gi"
-            limits:
-              cpu: "2"
-              memory: "2Gi"
-          
-          persistence:
-            enabled: true
-            size: "20Gi"
-            storageClassName: "gp3"
+        # For chart version 8.x, configuration is done via a `nodeSets` array.
+        # This is a major change from the 7.x chart versions.
+        nodeSets:
+          - name: default
+            count: 1
+            config:
+              node.master: true
+              node.data: true
+              node.ingest: true
+              cluster.initial_master_nodes:
+                - elasticsearch-default-0
+            
+            # Persistence is defined within a volumeClaimTemplates block
+            # inside the nodeSet configuration.
+            volumeClaimTemplates:
+              - metadata:
+                  name: elasticsearch-data # This name is required by the chart
+                spec:
+                  accessModes:
+                    - ReadWriteOnce
+                  resources:
+                    requests:
+                      # This structure now directly mirrors the final PVC manifest
+                      storage: 20Gi
+                  storageClassName: gp3
 
   destination:
     server: https://kubernetes.default.svc
