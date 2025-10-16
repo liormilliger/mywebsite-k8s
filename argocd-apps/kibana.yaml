@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: filebeat
+  name: kibana
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argocroj.io
@@ -9,41 +9,21 @@ spec:
   project: default
   source:
     repoURL: https://helm.elastic.co
-    chart: filebeat
+    chart: kibana
     targetRevision: 8.5.1
     helm:
       values: |
-        # Filebeat will be deployed as a DaemonSet, running one pod on each node of your cluster.
-        daemonset:
-          enabled: true
-          # Mounts necessary host paths to collect logs from containers.
-          filebeatConfig:
-            filebeat.yml: |
-              filebeat.autodiscover:
-                providers:
-                  - type: kubernetes
-                    node: ${NODE_NAME}
-                    hints.enabled: true
-                    hints.default_config:
-                      type: container
-                      paths:
-                        - /var/log/containers/*-${data.kubernetes.container.id}.log
-              
-              processors:
-                - add_kubernetes_metadata:
-                    in_cluster: true
+        # This tells Kibana how to connect to the Elasticsearch service.
+        # The service name 'elasticsearch-master' is the default created by the official Helm chart.
+        elasticsearchHosts: ["http://elasticsearch-master.logging.svc:9200"]
 
-              output.elasticsearch:
-                hosts: ["elasticsearch-master.logging.svc:9200"]
-                
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "100Mi"
-            limits:
-              cpu: "200m"
-              memory: "200Mi"
-
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "1"
+            memory: "1Gi"
   destination:
     server: https://kubernetes.default.svc
     namespace: logging
