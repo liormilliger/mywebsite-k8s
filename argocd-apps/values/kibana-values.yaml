@@ -1,17 +1,23 @@
 elasticsearchHosts: "https://elasticsearch-master.logging.svc:9200"
 
-# This section tells Kubernetes how to get the password for Kibana
 extraEnvs:
-  - name: ELASTICSEARCH_PASSWORD
+  - name: ELASTICSEARCH_SERVICEACCOUNTTOKEN
     valueFrom:
       secretKeyRef:
-        name: elasticsearch-master-credentials
-        key: password
+        name: kibana-es-token # This is the secret our Job creates
+        key: token
 
 kibanaConfig:
   kibana.yml: |
-    elasticsearch.username: "elastic"
-    elasticsearch.password: "${ELASTICSEARCH_PASSWORD}"
+    elasticsearch.serviceAccountToken: "${ELASTICSEARCH_SERVICEACCOUNTTOKEN}"
+    elasticsearch.ssl.verificationMode: certificate
+    elasticsearch.ssl.certificateAuthorities:
+      - /usr/share/kibana/config/certs/ca.crt
+
+secretMounts:
+  - name: elasticsearch-http-certs
+    secretName: elasticsearch-es-http-certs-public
+    path: /usr/share/kibana/config/certs
 
 resources:
   requests:
