@@ -1,13 +1,18 @@
 daemonset:
   enabled: true
   
-  # This section tells Kubernetes how to get the password
   extraEnvs:
     - name: ELASTIC_PASSWORD
       valueFrom:
         secretKeyRef:
           name: elasticsearch-master-credentials
           key: password
+
+  # Add this section to mount the TLS certificate secret
+  secretMounts:
+    - name: elasticsearch-http-certs
+      secretName: elasticsearch-master-certs # Secret created by the ES chart
+      path: /usr/share/filebeat/certs/http
 
   filebeatConfig:
     filebeat.yml: |
@@ -26,10 +31,17 @@ daemonset:
             in_cluster: true
 
       output.elasticsearch:
-        hosts: ["elasticsearch-master.logging.svc:9200"]
-        # These lines tell Filebeat to use the credentials
+        # 1. Change http to https
+        hosts: ["https://elasticsearch-master.logging.svc:9200"]
         username: "elastic"
-        password: "${ELASTIC_PASSWORD}" # Reads from the environment variable
+        password: "${ELASTIC_PASSWORD}"
+
+        # 2. Add the ssl configuration section
+        ssl:
+          enabled: true
+          ca_trusted_fingerprint: "" # Optional: for fingerprint verification
+          certificate_authorities:
+            - "/usr/share/filebeat/certs/http/ca.crt" # Path to the mounted CA
         
   resources:
     requests:
