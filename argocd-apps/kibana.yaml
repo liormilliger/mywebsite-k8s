@@ -7,13 +7,18 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  source:
-    repoURL: https://helm.elastic.co
-    chart: kibana
-    targetRevision: 8.5.1
-    helm:
-      valueFiles:
-        - ./values/kibana-values.yaml
+  sources:
+    - repoURL: https://helm.elastic.co
+      chart: kibana
+      targetRevision: 8.5.1
+      helm:
+        valueFiles:
+          - $values/argocd-apps/values/kibana-values.yaml
+    
+    - repoURL: git@github.com:liormilliger/mywebsite-k8s.git
+      targetRevision: HEAD
+      ref: values
+
   destination:
     server: https://kubernetes.default.svc
     namespace: logging
@@ -23,4 +28,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      

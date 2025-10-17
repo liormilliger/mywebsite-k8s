@@ -7,20 +7,25 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  source:
-    repoURL: https://helm.elastic.co
-    chart: filebeat
-    targetRevision: 8.5.1
-    helm:
-      valueFiles:
-        - ./values/filebeat-values.yaml
+  sources:
+    - repoURL: https://helm.elastic.co
+      chart: filebeat
+      targetRevision: 8.5.1
+      helm:
+        valueFiles:
+          - $values/argocd-apps/values/filebeat-values.yaml
+    
+    - repoURL: git@github.com:liormilliger/mywebsite-k8s.git
+      targetRevision: HEAD
+      ref: values
+
   destination:
     server: https://kubernetes.default.svc
     namespace: logging
+  
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      

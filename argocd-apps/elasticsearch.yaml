@@ -8,7 +8,6 @@ metadata:
 spec:
   project: default
   sources:
-    # 1️⃣ Helm chart source
     - repoURL: https://helm.elastic.co
       chart: elasticsearch
       targetRevision: 8.5.1
@@ -16,7 +15,6 @@ spec:
         valueFiles:
           - $values/argocd-apps/values/es-values.yaml
 
-    # 2️⃣ Git repo with the values file
     - repoURL: git@github.com:liormilliger/mywebsite-k8s.git
       targetRevision: HEAD
       ref: values
