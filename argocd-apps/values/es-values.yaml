@@ -1,0 +1,20 @@
+nodeSets:
+  - name: default
+    count: 1
+    config:
+      node.master: true
+      node.data: true
+      node.ingest: true
+      cluster.initial_master_nodes:
+        - elasticsearch-default-0
+    
+    volumeClaimTemplates:
+      - metadata:
+          name: elasticsearch-data 
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 20Gi
+          storageClassName: gp3

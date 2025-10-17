@@ -1,0 +1,8 @@
+elasticsearchHosts: "https://elasticsearch-master.logging.svc:9200"
+resources:
+  requests:
+    cpu: "500m"
+    memory: "1Gi"
+  limits:
+    cpu: "1"
+    memory: "1Gi"

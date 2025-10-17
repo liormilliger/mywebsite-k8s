@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kibana
+  name: filebeat
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -9,11 +9,11 @@ spec:
   project: default
   source:
     repoURL: https://helm.elastic.co
-    chart: kibana
+    chart: filebeat
     targetRevision: 8.5.1
     helm:
       valueFiles:
-        - ./values/kibana-values.yaml
+        - ./values/filebeat-values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: logging
