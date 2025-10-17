@@ -24,10 +24,5 @@ resources:
     memory: "2Gi"
   limits:
     cpu: "1"
-    memory: "4Gi"
+    memory: "3Gi"
 
-# Optional: disable anti-affinity if you have only one node
-podAntiAffinity: "soft"
-
-# Optional: set image version explicitly (to match chart)
-imageTag: "8.5.1"

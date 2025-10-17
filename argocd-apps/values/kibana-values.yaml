@@ -1,4 +1,18 @@
 elasticsearchHosts: "https://elasticsearch-master.logging.svc:9200"
+
+# This section tells Kubernetes how to get the password for Kibana
+extraEnvs:
+  - name: ELASTICSEARCH_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: elasticsearch-master-credentials
+        key: password
+
+kibanaConfig:
+  kibana.yml: |
+    elasticsearch.username: "elastic"
+    elasticsearch.password: "${ELASTICSEARCH_PASSWORD}"
+
 resources:
   requests:
     cpu: "500m"

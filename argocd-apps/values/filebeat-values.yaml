@@ -1,5 +1,14 @@
 daemonset:
   enabled: true
+  
+  # This section tells Kubernetes how to get the password
+  extraEnvs:
+    - name: ELASTIC_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: elasticsearch-master-credentials
+          key: password
+
   filebeatConfig:
     filebeat.yml: |
       filebeat.autodiscover:
@@ -18,6 +27,9 @@ daemonset:
 
       output.elasticsearch:
         hosts: ["elasticsearch-master.logging.svc:9200"]
+        # These lines tell Filebeat to use the credentials
+        username: "elastic"
+        password: "${ELASTIC_PASSWORD}" # Reads from the environment variable
         
   resources:
     requests:
