@@ -11,7 +11,7 @@ spec:
     # This must be the URL to YOUR Git repository
     repoURL: git@github.com:liormilliger/mywebsite-k8s.git
     # This is the path to the folder containing this manifest
-    path: applications
+    path: argocd-apps
     targetRevision: HEAD
     helm:
       # Details for the Helm chart itself
@@ -30,4 +30,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      
