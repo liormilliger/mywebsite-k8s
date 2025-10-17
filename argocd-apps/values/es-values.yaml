@@ -1,16 +1,14 @@
+replicas: 1
+
 nodeSets:
   - name: default
     count: 1
     config:
-      node.master: true
-      node.data: true
-      node.ingest: true
-      cluster.initial_master_nodes:
-        - elasticsearch-default-0
-    
+      node.roles: ["master", "data", "ingest"]
+      cluster.initial_master_nodes: ["elasticsearch-default-0"]
     volumeClaimTemplates:
       - metadata:
-          name: elasticsearch-data 
+          name: elasticsearch-data
         spec:
           accessModes:
             - ReadWriteOnce
@@ -18,3 +16,18 @@ nodeSets:
             requests:
               storage: 20Gi
           storageClassName: gp3
+
+# Optional: customize resources if needed
+resources:
+  requests:
+    cpu: "500m"
+    memory: "2Gi"
+  limits:
+    cpu: "1"
+    memory: "4Gi"
+
+# Optional: disable anti-affinity if you have only one node
+podAntiAffinity: "soft"
+
+# Optional: set image version explicitly (to match chart)
+imageTag: "8.5.1"
