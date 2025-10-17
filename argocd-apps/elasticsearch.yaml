@@ -14,7 +14,7 @@ spec:
       targetRevision: 8.5.1
       helm:
         valueFiles:
-          - $values/argocd/apps/values/es-values.yaml
+          - $values/argocd-apps/values/es-values.yaml
 
     # 2️⃣ Git repo with the values file
     - repoURL: git@github.com:liormilliger/mywebsite-k8s.git
