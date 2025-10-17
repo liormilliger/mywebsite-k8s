@@ -8,11 +8,18 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://helm.elastic.co
-    chart: elasticsearch
-    targetRevision: 8.5.1
+    # This must be the URL to YOUR Git repository
+    repoURL: git@github.com:liormilliger/mywebsite-k8s.git
+    # This is the path to the folder containing this manifest
+    path: applications
+    targetRevision: HEAD
     helm:
+      # Details for the Helm chart itself
+      chart: elasticsearch
+      repo: https://helm.elastic.co
+      targetRevision: 8.5.1
       valueFiles:
+        # Correct path relative to this file
         - ./values/es-values.yaml
   destination:
     server: https://kubernetes.default.svc
