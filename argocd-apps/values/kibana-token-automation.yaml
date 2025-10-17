@@ -1,0 +1,79 @@
+# 1. Service Account for the Job to use
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kibana-token-creator-sa
+  namespace: logging
+---
+# 2. Permissions for the Service Account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: kibana-token-creator-role
+  namespace: logging
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "create"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["list"]
+- apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["create"]
+---
+# 3. Bind the permissions to the Service Account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: kibana-token-creator-binding
+  namespace: logging
+subjects:
+- kind: ServiceAccount
+  name: kibana-token-creator-sa
+  namespace: logging
+roleRef:
+  kind: Role
+  name: kibana-token-creator-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# 4. The Job to create the token
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-kibana-token
+  namespace: logging
+  annotations:
+    # Tell ArgoCD to run this during the sync phase
+    argocd.argoproj.io/hook: Sync
+    # Tell ArgoCD to delete this Job after it succeeds
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      serviceAccountName: kibana-token-creator-sa
+      restartPolicy: OnFailure
+      containers:
+      - name: token-creator
+        image: bitnami/kubectl:1.27 # An image with kubectl
+        command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          set -e
+          # First, check if the secret already exists. If so, do nothing.
+          if kubectl get secret kibana-es-token -n logging > /dev/null 2>&1; then
+            echo "Kibana token secret already exists. Exiting."
+            exit 0
+          fi
+
+          echo "Waiting for Elasticsearch pod..."
+          ES_POD=$(kubectl get pod -l app=elasticsearch-master -n logging -o jsonpath='{.items[0].metadata.name}')
+          
+          echo "Generating token inside pod $ES_POD..."
+          TOKEN=$(kubectl exec -n logging $ES_POD -- \
+            /usr/share/elasticsearch/bin/elasticsearch-service-tokens create elastic/kibana kibana-token | \
+            grep "SERVICE_TOKEN =" | awk '{print $3}')
+
+          echo "Creating secret 'kibana-es-token'..."
+          kubectl create secret generic kibana-es-token -n logging --from-literal=token="$TOKEN"
