@@ -8,11 +8,11 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'git@github.com:liormilliger/mywebsite-k8s.git'
+    repoURL: https://helm.elastic.co
     path: argocd-apps
     targetRevision: HEAD
     helm:
-      repo: https://helm.elastic.co
+      repo: 'git@github.com:liormilliger/mywebsite-k8s.git'
       chart: elasticsearch
       targetRevision: 8.5.1
       valueFiles:
