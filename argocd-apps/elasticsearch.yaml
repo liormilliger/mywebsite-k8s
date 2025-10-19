@@ -5,6 +5,8 @@ metadata:
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   project: default
   sources:
@@ -16,7 +18,7 @@ spec:
           - $values/argocd-apps/values/es-values.yaml
 
     - repoURL: git@github.com:liormilliger/mywebsite-k8s.git
-      targetRevision: HEAD
+      targetRevision: main
       ref: values
 
   destination:
