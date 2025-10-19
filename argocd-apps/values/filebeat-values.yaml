@@ -12,7 +12,20 @@ daemonset:
     - name: elasticsearch-http-certs
       secretName: elasticsearch-master-certs # Secret created by the ES chart
       path: /usr/share/filebeat/certs/http
-  
+
+  readinessProbe:
+    exec:
+      command:
+        - sh
+        - -c
+        - |
+          #!/usr/bin/env bash -e
+          curl --fail 127.0.0.1:5066
+    failureThreshold: 3
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+
   resources:
     requests:
       cpu: "100m"
