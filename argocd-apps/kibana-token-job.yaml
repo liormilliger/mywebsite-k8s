@@ -1,24 +1,26 @@
-# your-kubernetes-repo/argocd-apps/my-website-app.yaml
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: my-website
+  name: kibana-token-job
   namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
   annotations:
-    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   project: default
   source:
     repoURL: git@github.com:liormilliger/mywebsite-k8s.git
-    targetRevision: main
-    path: my-app-chart
+    targetRevision: HEAD 
+    path: values 
+    
+    directory:
+      include: "kibana-token-automation.yaml"
+      
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: logging
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
