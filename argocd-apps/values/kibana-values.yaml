@@ -19,7 +19,7 @@ kibanaConfig:
 secretMounts:
   - name: elasticsearch-http-certs
     secretName: elasticsearch-es-http-certs-public
-    path: /usr/share/kibana/config/certs
+    path: /usr/share/kibana/config/es-ca-certs
 
 resources:
   requests:
