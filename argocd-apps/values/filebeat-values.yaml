@@ -10,7 +10,7 @@ daemonset:
 
   secretMounts:
     - name: elasticsearch-http-certs
-      secretName: elasticsearch-master-certs # Secret created by the ES chart
+      secretName: elasticsearch-master-certs
       path: /usr/share/filebeat/certs/http
 
   readinessProbe:
