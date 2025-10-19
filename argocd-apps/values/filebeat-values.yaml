@@ -8,14 +8,13 @@ daemonset:
           name: elasticsearch-master-credentials
           key: password
 
-  # Add this section to mount the TLS certificate secret
   secretMounts:
     - name: elasticsearch-http-certs
       secretName: elasticsearch-master-certs # Secret created by the ES chart
       path: /usr/share/filebeat/certs/http
 
-  filebeatConfig:
-    filebeat.yml: |
+filebeatConfig:
+  filebeat.yml: |
       filebeat.autodiscover:
         providers:
           - type: kubernetes
@@ -31,12 +30,10 @@ daemonset:
             in_cluster: true
 
       output.elasticsearch:
-        # 1. Change http to https
         hosts: ["https://elasticsearch-master.logging.svc:9200"]
         username: "elastic"
         password: "${ELASTIC_PASSWORD}"
 
-        # 2. Add the ssl configuration section
         ssl:
           enabled: true
           ca_trusted_fingerprint: "" # Optional: for fingerprint verification
