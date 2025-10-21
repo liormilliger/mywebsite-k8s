@@ -10,16 +10,16 @@ metadata:
 spec:
   project: default
   sources:
+    - repoURL: git@github.com:liormilliger/mywebsite-k8s.git
+      targetRevision: main
+      ref: values
+
     - repoURL: https://helm.elastic.co
       chart: filebeat
       targetRevision: 8.5.1
       helm:
         valueFiles:
           - $values/argocd-apps/values/filebeat-values.yaml
-    
-    - repoURL: git@github.com:liormilliger/mywebsite-k8s.git
-      targetRevision: main
-      ref: values
 
   destination:
     server: https://kubernetes.default.svc
