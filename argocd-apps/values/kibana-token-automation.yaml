@@ -1,40 +1,3 @@
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: kibana-token-creator-sa
-  namespace: logging
----
-# Permissions for the Service Account
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: kibana-token-creator-role
-  namespace: logging
-rules:
-- apiGroups: [""]
-  resources: ["secrets"]
-  verbs: ["get", "create"]
-- apiGroups: [""]
-  resources: ["pods"]
-  verbs: ["list"]
-- apiGroups: [""]
-  resources: ["pods/exec"]
-  verbs: ["create"]
----
-# Bind the permissions to the Service Account
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: kibana-token-creator-binding
-  namespace: logging
-subjects:
-- kind: ServiceAccount
-  name: kibana-token-creator-sa
-  namespace: logging
-roleRef:
-  kind: Role
-  name: kibana-token-creator-role
-  apiGroup: rbac.authorization.k8s.io
 ---
 # The Job to create the token
 apiVersion: batch/v1
@@ -60,23 +23,51 @@ spec:
         - "-c"
         - |
           set -e
+          # Use the correct secret name from kibana-values.yaml
+          SECRET_NAME="kibana-kibana-es-token" 
+          
           # First, check if the secret already exists. If so, do nothing.
-          if kubectl get secret kibana-es-token -n logging > /dev/null 2>&1; then
-            echo "Kibana token secret already exists. Exiting."
+          if kubectl get secret $SECRET_NAME -n logging > /dev/null 2>&1; then
+            echo "Kibana token secret '$SECRET_NAME' already exists. Exiting."
             exit 0
           fi
 
           echo "Waiting for Elasticsearch pod to be ready..."
-          # --- THIS IS THE UPDATED LINE ---
           kubectl wait --for=condition=Ready pod \
             -l app=elasticsearch-master \
             -n logging --timeout=300s
-          # --------------------------------
 
-          echo "Waiting for Elasticsearch pod..."
+          echo "Getting Elasticsearch pod name..."
           ES_POD=$(kubectl get pod -l app=elasticsearch-master -n logging -o jsonpath='{.items[0].metadata.name}')
           
+          if [ -z "$ES_POD" ]; then
+            echo "Could not find Elasticsearch pod."
+            exit 1
+          fi
+
           echo "Generating token inside pod $ES_POD..."
+          #
+          # --- FIX START ---
+          # 1. Execute the command to create the token
+          # 2. Grep for the line containing "VALUE ="
+          # 3. Use awk to print the 3rd field (the token string)
+          #
           TOKEN=$(kubectl exec -n logging $ES_POD -- \
             /usr/share/elasticsearch/bin/elasticsearch-service-tokens create elastic/kibana kibana-token | \
-            grep
+            grep "VALUE =" | awk '{print $3}')
+          # --- FIX END ---
+
+          if [ -z "$TOKEN" ]; then
+            echo "Failed to generate or extract token."
+            exit 1
+          fi
+
+          echo "Token extracted. Creating secret '$SECRET_NAME'..."
+          
+          # Create the secret with the key 'token', as expected by kibana-values.yaml
+          kubectl create secret generic $SECRET_NAME -n logging \
+            --from-literal=token=$TOKEN
+          
+          echo "Secret '$SECRET_NAME' created successfully."
+  # Added to make this a complete and valid Job spec
+  backoffLimit: 4

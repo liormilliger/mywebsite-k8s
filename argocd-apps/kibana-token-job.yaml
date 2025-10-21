@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: git@github.com:liormilliger/mywebsite-k8s.git
     targetRevision: HEAD 
-    path: values 
+    path: argocd-apps/values
     
     directory:
       include: "kibana-token-automation.yaml"
