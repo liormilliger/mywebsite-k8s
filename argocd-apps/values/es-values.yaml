@@ -1,19 +1,17 @@
 replicas: 1
+roles:
+  master: "true"
+  data: "true"
+  ingest: "true"
 
-nodeSets:
-  - name: default
-    count: 1
-    config:
-      node.roles: ["master", "data", "ingest"]
-      cluster.initial_master_nodes: ["elasticsearch-default-0"]
-    volumeClaimTemplates:
-      - metadata:
-          name: elasticsearch-data
-        spec:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: 20Gi
-          storageClassName: gp3
+persistence:
+  enabled: true
+  size: 20Gi
+  storageClassName: gp3
 
+# Required for a single-node cluster to start correctly
+extraEnvs:
+  - name: "discovery.type"
+    value: "single-node"
+  - name: "cluster.initial_master_nodes"
+    value: "elasticsearch-master-0"
