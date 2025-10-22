@@ -10,7 +10,7 @@ metadata:
 spec:
   project: default
   sources:
-    - repoURL: git@github.com:liormilliger/mywebsite-k8s.git/argocd-apps/values
+    - repoURL: https://github.com/liormilliger/mywebsite-k8s.git/argocd-apps/values
       targetRevision: main
       ref: values
 
