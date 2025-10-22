@@ -13,13 +13,15 @@ spec:
     - repoURL: git@github.com:liormilliger/mywebsite-k8s.git
       targetRevision: main
       ref: values
-    
+      path: argocd-apps
+
     - repoURL: https://helm.elastic.co
       chart: elasticsearch
       targetRevision: 8.5.1
       helm:
         valueFiles:
-          - $values/argocd-apps/values/es-values.yaml
+          - $values/values/es-values.yaml
+
 
   destination:
     server: https://kubernetes.default.svc

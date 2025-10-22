@@ -17,12 +17,3 @@ nodeSets:
               storage: 20Gi
           storageClassName: gp3
 
-# Optional: customize resources if needed
-resources:
-  requests:
-    cpu: "500m"
-    memory: "2Gi"
-  limits:
-    cpu: "1"
-    memory: "3Gi"
-
