@@ -10,17 +10,16 @@ metadata:
 spec:
   project: default
   sources:
-    - repoURL: git@github.com:liormilliger/mywebsite-k8s.git
+    - repoURL: git@github.com:liormilliger/mywebsite-k8s.git/argocd-apps/values
       targetRevision: main
       ref: values
-      path: argocd-apps
 
     - repoURL: https://helm.elastic.co
       chart: elasticsearch
       targetRevision: 8.5.1
       helm:
         valueFiles:
-          - $values/values/es-values.yaml
+          - $values/es-values.yaml
 
 
   destination:
