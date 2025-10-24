@@ -1,5 +1,5 @@
-clusterName: "elasticsearch-single-node"
-nodeGroup: "master"
+clusterName: elasticsearch-single-node
+nodeGroup: master
 replicas: 1
 
 roles:
