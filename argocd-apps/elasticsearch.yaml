@@ -9,17 +9,17 @@ metadata:
     argocd.argoproj.io/sync-wave: "0"
 spec:
   project: default
-  sources:
-    - repoURL: https://github.com/liormilliger/mywebsite-k8s.git
-      targetRevision: HEAD
-      ref: values
+  source:
+    # - repoURL: https://github.com/liormilliger/mywebsite-k8s.git
+    #   targetRevision: HEAD
+    #   ref: values
 
     - repoURL: https://helm.elastic.co
       chart: elasticsearch
       targetRevision: 8.5.1
-      helm:
-        valueFiles:
-          - $values/argocd-apps/values/es-values.yaml
+      # helm:
+      #   valueFiles:
+      #     - $values/argocd-apps/values/es-values.yaml
 
 
   destination:
