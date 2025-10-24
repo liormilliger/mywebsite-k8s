@@ -2,17 +2,16 @@ clusterName: "elasticsearch-single-node"
 nodeGroup: "master"
 replicas: 1
 
-# Configure Elasticsearch settings for single-node discovery
+# Roles must be a map — not a list
+roles:
+  master: "true"
+  data: "true"
+  ingest: "true"
+
+# Elasticsearch configuration
 esConfig:
   elasticsearch.yml: |
     discovery.type: single-node
-    # cluster.initial_master_nodes: [] # This setting is not allowed with discovery.type: single-node
-
-# Define roles for the single node
-roles:
-  master: "true"
-  ingest: "true"
-  data: "true"
 
 # Persistent storage configuration
 volumeClaimTemplate:
