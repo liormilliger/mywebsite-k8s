@@ -14,9 +14,9 @@ spec:
     #   targetRevision: HEAD
     #   ref: values
 
-    - repoURL: https://helm.elastic.co
-      chart: elasticsearch
-      targetRevision: 8.5.1
+    repoURL: https://helm.elastic.co
+    chart: elasticsearch
+    targetRevision: 8.5.1
       # helm:
       #   valueFiles:
       #     - $values/argocd-apps/values/es-values.yaml
