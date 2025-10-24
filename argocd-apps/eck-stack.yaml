@@ -6,7 +6,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   annotations:
-    argocd.argocd.argoproj.io/sync-wave: "0"
+    argocd.argocd.argoproj.io/sync-wave: "1"
 spec:
   project: default
   source:
