@@ -1,10 +1,5 @@
 replicas: 1
 
-roles:
-  master: "true"
-  data: "true"
-  ingest: "true"
-
 master:
   persistence:
     enabled: true
