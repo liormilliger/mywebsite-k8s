@@ -1,0 +1,85 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: filebeat-eck
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    # This is "Wave 1" - it will only sync after eck-stack is healthy
+    argocd.argocd.argoproj.io/sync-wave: "1" 
+spec:
+  project: default
+  source:
+    repoURL: https://helm.elastic.co
+    chart: filebeat
+    targetRevision: 8.5.1 # You can use the same Filebeat *app* version
+    helm:
+      # We override values directly here to connect to the ECK-managed cluster
+      values: |
+        daemonset:
+          enabled: true
+          
+          extraEnvs:
+            - name: ELASTIC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  # This secret is created by the ECK operator
+                  name: quickstart-es-elastic-user 
+                  key: elastic
+                  # Note: This secret is in the 'elastic-system' namespace
+
+          secretMounts:
+            - name: elasticsearch-http-certs
+              # This CA cert secret is also created by the ECK operator
+              secretName: quickstart-es-http-ca-internal 
+              path: /usr/share/filebeat/certs/http
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "100Mi"
+            limits:
+              cpu: "200m"
+              memory: "200Mi"
+
+        filebeatConfig:
+          filebeat.yml: |
+            filebeat.autodiscover:
+              providers:
+                - type: kubernetes
+                  node: ${NODE_NAME}
+                  hints.enabled: true
+                  hints.default_config:
+                    type: container
+                    paths:
+                      - /var/log/containers/*-${data.kubernetes.container.id}.log
+              
+            processors:
+              - add_kubernetes_metadata:
+                  in_cluster: true
+
+            output.elasticsearch:
+              # This is the new service name created by ECK
+              hosts: ["https://quickstart-es-http.elastic-system.svc:9200"]
+              username: "elastic"
+              password: "${ELASTIC_PASSWORD}"
+
+              ssl:
+                enabled: true
+                certificate_authorities:
+                  - "/usr/share/filebeat/certs/http/ca.crt"
+
+  destination:
+    server: https://kubernetes.default.svc
+    # Deploying Filebeat into 'elastic-system' is simplest
+    # as it can easily access the secrets created there.
+    namespace: elastic-system 
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false # 'eck-stack' in wave 0 already created it
+      
