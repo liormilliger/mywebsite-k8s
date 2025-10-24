@@ -1,29 +1,16 @@
 replicas: 1
+
 roles:
-  - master
-  - data
-  - ingest
+  master: "true"
+  data: "true"
+  ingest: "true"
 
-persistence:
-  enabled: true
-  size: 20Gi
-  storageClassName: gp3
+master:
+  persistence:
+    enabled: true
+    size: 20Gi
+    storageClass: gp3
 
-# Required for a single-node cluster to start correctly
 extraEnvs:
-  - name: "discovery.type"
-    value: "single-node"
-  # - name: "cluster.initial_master_nodes"
-  #   value: "elasticsearch-master-0"
-
-#     "error.message":"setting [cluster.initial_master_nodes] is not allowed when [discovery.type] is set to [single-node]",
-#     "error.stack_trace":"java.lang.IllegalArgumentException:
-#     setting [cluster.initial_master_nodes] is not allowed when [discovery.type] is set to [single-node]
-#     tat org.elasticsearch.server@8.5.1/org.elasticsearch.cluster.coordination.ClusterBootstrapService.
-#     <init>(ClusterBootstrapService.java:87)\n\tat org.elasticsearch.server@8.5.1/org.elasticsearch.cluster.coordination.Coordinator.
-#     <init>(Coordinator.java:279)\n\tat org.elasticsearch.server@8.5.1/org.elasticsearch.discovery.DiscoveryModule.
-#     <init>(DiscoveryModule.java:193)\n\tat org.elasticsearch.server@8.5.1/org.elasticsearch.node.Node.
-#     <init>(Node.java:876)\n\tat org.elasticsearch.server@8.5.1/org.elasticsearch.node.Node.<init>(Node.java:318)
-#     tat org.elasticsearch.server@8.5.1/org.elasticsearch.bootstrap.Elasticsearch$2.
-#     <init>(Elasticsearch.java:214)\n\tat org.elasticsearch.server@8.5.1/org.elasticsearch.bootstrap.Elasticsearch.initPhase3(Elasticsearch.java:214)\n\tat org.elasticsearch.server@8.5.1/org.elasticsearch.bootstrap.Elasticsearch.main(Elasticsearch.java:67)\n"}
-# ERROR: Elasticsearch did not exit normally - check the logs at /usr/share/elasticsearch/logs/elasticsearch.log
+  - name: discovery.type
+    value: single-node
