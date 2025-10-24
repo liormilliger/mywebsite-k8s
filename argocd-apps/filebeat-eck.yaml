@@ -25,14 +25,14 @@ spec:
               valueFrom:
                 secretKeyRef:
                   # This secret is created by the ECK operator
-                  name: quickstart-es-elastic-user 
+                  name: elasticsearch-es-elastic-user 
                   key: elastic
                   # Note: This secret is in the 'elastic-system' namespace
 
           secretMounts:
             - name: elasticsearch-http-certs
               # This CA cert secret is also created by the ECK operator
-              secretName: quickstart-es-http-ca-internal 
+              secretName: elasticsearch-es-http-ca-internal 
               path: /usr/share/filebeat/certs/http
 
           resources:
@@ -61,7 +61,7 @@ spec:
 
             output.elasticsearch:
               # This is the new service name created by ECK
-              hosts: ["https://quickstart-es-http.elastic-system.svc:9200"]
+              hosts: ["https://elasticsearch-es-http.elastic-system.svc:9200"]
               username: "elastic"
               password: "${ELASTIC_PASSWORD}"
 
