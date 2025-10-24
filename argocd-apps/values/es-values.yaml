@@ -1,11 +1,23 @@
+clusterName: "elasticsearch-single-node"
+nodeGroup: "master"
 replicas: 1
 
-master:
-  persistence:
-    enabled: true
-    size: 20Gi
-    storageClass: gp3
+# Configure Elasticsearch settings for single-node discovery
+esConfig:
+  elasticsearch.yml: |
+    discovery.type: single-node
+    # cluster.initial_master_nodes: [] # This setting is not allowed with discovery.type: single-node
 
-extraEnvs:
-  - name: discovery.type
-    value: single-node
+# Define roles for the single node
+roles:
+  master: "true"
+  ingest: "true"
+  data: "true"
+
+# Persistent storage configuration
+volumeClaimTemplate:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: "gp3"
+  resources:
+    requests:
+      storage: 20Gi
