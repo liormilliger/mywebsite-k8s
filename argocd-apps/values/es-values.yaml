@@ -2,21 +2,18 @@ clusterName: "elasticsearch-single-node"
 nodeGroup: "master"
 replicas: 1
 
-# Roles must be a map — not a list
 roles:
   master: "true"
   data: "true"
   ingest: "true"
 
-# Elasticsearch configuration
 esConfig:
   elasticsearch.yml: |
     discovery.type: single-node
 
-# Persistent storage configuration
 volumeClaimTemplate:
   accessModes: ["ReadWriteOnce"]
-  storageClassName: "gp3"
+  storageClassName: gp3
   resources:
     requests:
       storage: 20Gi
