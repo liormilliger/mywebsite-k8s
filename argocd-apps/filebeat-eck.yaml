@@ -29,11 +29,31 @@ spec:
                   key: elastic
                   # Note: This secret is in the 'elastic-system' namespace
 
-          secretMounts:
+          # --- FIX START ---
+          # 1. REMOVE the simple 'secretMounts' helper
+          # secretMounts:
+          #   - name: elasticsearch-http-certs
+          #     secretName: elasticsearch-es-http-ca-internal 
+          #     path: /usr/share/filebeat/certs/http
+
+          # 2. ADD 'extraVolumes' to define the secret volume precisely
+          extraVolumes:
             - name: elasticsearch-http-certs
-              # This CA cert secret is also created by the ECK operator
-              secretName: elasticsearch-es-http-ca-internal 
-              path: /usr/share/filebeat/certs/http
+              secret:
+                secretName: elasticsearch-es-http-ca-internal
+                # Map the key 'ca.crt' from the secret to a file also named 'ca.crt'
+                # This file will be the only thing in this volume.
+                items:
+                  - key: ca.crt
+                    path: ca.crt
+
+          # 3. ADD 'extraVolumeMounts' to mount the volume from step 2
+          extraVolumeMounts:
+            - name: elasticsearch-http-certs
+              # Mount the volume at this directory
+              mountPath: /usr/share/filebeat/certs/http
+              readOnly: true
+          # --- FIX END ---
 
           resources:
             requests:
@@ -68,6 +88,7 @@ spec:
               ssl:
                 enabled: true
                 certificate_authorities:
+                  # This path will now be correct, as our volume mount creates this file:
                   - "/usr/share/filebeat/certs/http/ca.crt"
 
   destination:
@@ -82,3 +103,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=false # 'eck-stack' in wave 0 already created it
+      
