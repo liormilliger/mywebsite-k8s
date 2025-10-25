@@ -6,54 +6,38 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   annotations:
-    # This is "Wave 1" - it will only sync after eck-stack is healthy
-    argocd.argocd.argoproj.io/sync-wave: "2" 
+    argocd.argoproj.io/sync-wave: "2" 
 spec:
   project: default
   source:
     repoURL: https://helm.elastic.co
     chart: filebeat
-    targetRevision: 8.5.1 # You can use the same Filebeat *app* version
+    targetRevision: 8.5.1
     helm:
-      # We override values directly here to connect to the ECK-managed cluster
       values: |
         daemonset:
           enabled: true
-          
+          secretMounts: []
+
           extraEnvs:
             - name: ELASTIC_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  # This secret is created by the ECK operator
                   name: elasticsearch-es-elastic-user 
                   key: elastic
-                  # Note: This secret is in the 'elastic-system' namespace
 
-          # --- FIX START ---
-          # 1. REMOVE the simple 'secretMounts' helper
-          # secretMounts:
-          #   - name: elasticsearch-http-certs
-          #     secretName: elasticsearch-es-http-ca-internal 
-          #     path: /usr/share/filebeat/certs/http
-
-          # 2. ADD 'extraVolumes' to define the secret volume precisely
           extraVolumes:
             - name: elasticsearch-http-certs
               secret:
                 secretName: elasticsearch-es-http-ca-internal
-                # Map the key 'ca.crt' from the secret to a file also named 'ca.crt'
-                # This file will be the only thing in this volume.
                 items:
-                  - key: ca.pem
+                  - key: tls.crt
                     path: ca.crt
 
-          # 3. ADD 'extraVolumeMounts' to mount the volume from step 2
           extraVolumeMounts:
             - name: elasticsearch-http-certs
-              # Mount the volume at this directory
               mountPath: /usr/share/filebeat/certs/http
               readOnly: true
-          # --- FIX END ---
 
           resources:
             requests:
@@ -80,7 +64,6 @@ spec:
                   in_cluster: true
 
             output.elasticsearch:
-              # This is the new service name created by ECK
               hosts: ["https://elasticsearch-es-http.elastic-system.svc:9200"]
               username: "elastic"
               password: "${ELASTIC_PASSWORD}"
@@ -88,13 +71,10 @@ spec:
               ssl:
                 enabled: true
                 certificate_authorities:
-                  # This path will now be correct, as our volume mount creates this file:
-                  - "/usr/share/filebeat/certs/http/ca.pem"
+                  - "/usr/share/filebeat/certs/http/ca.crt"
 
   destination:
     server: https://kubernetes.default.svc
-    # Deploying Filebeat into 'elastic-system' is simplest
-    # as it can easily access the secrets created there.
     namespace: elastic-system 
   
   syncPolicy:
@@ -102,4 +82,4 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=false # 'eck-stack' in wave 0 already created it
+      - CreateNamespace=false
