@@ -89,7 +89,7 @@ spec:
                 enabled: true
                 certificate_authorities:
                   # This path will now be correct, as our volume mount creates this file:
-                  - "/usr/share/filebeat/certs/http/ca.crt"
+                  - "/usr/share/filebeat/certs/http/ca.pem"
 
   destination:
     server: https://kubernetes.default.svc
