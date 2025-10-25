@@ -44,7 +44,7 @@ spec:
                 # Map the key 'ca.crt' from the secret to a file also named 'ca.crt'
                 # This file will be the only thing in this volume.
                 items:
-                  - key: ca.crt
+                  - key: ca.pem
                     path: ca.crt
 
           # 3. ADD 'extraVolumeMounts' to mount the volume from step 2
@@ -103,4 +103,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=false # 'eck-stack' in wave 0 already created it
-      
