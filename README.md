@@ -16,11 +16,24 @@ This website is part of a larger cloud-native project, deployed on AWS EKS. The 
 
 ## 🚀 ArgoCD App-of-Apps
 
-The `argocd-apps` folder contains the application definition files for the supporting apps I am managing with ArgoCD. This includes essential cluster services such as:
+The `argocd-apps` folder contains the application definition files for the supporting apps I am managing with ArgoCD. This 'app-of-apps' pattern automatically deploys and manages all the essential services for my cluster and my personal projects.
 
-* **cert-manager:** For automated management and issuance of TLS certificates.
-* **nginx-ingress-controller:** To manage external access to the services in the cluster.
-* **prometheus:** For monitoring and alerting.
+The stack is deployed in waves to manage dependencies and includes:
+
+* **Prometheus Stack (Monitoring):**
+    * `prometheus-stack-crds`: This application is deployed in the first sync wave (`-1`) and installs *only* the Custom Resource Definitions (CRDs) for the `kube-prometheus-stack`. This ensures the Kubernetes API recognizes resources like `ServiceMonitor` and `PodMonitor` before any other components are deployed.
+    * `prometheus-stack`: This deploys the full monitoring stack, including **Prometheus** for metrics collection and **Grafana** for visualization. It's configured to skip the CRDs since they are managed separately.
+
+* **Elastic Stack (Logging):**
+    * `eck-operator`: Deployed in sync wave `0`, this installs the **Elastic Cloud on Kubernetes (ECK) Operator**. This operator is responsible for managing the lifecycle of all Elastic components (Elasticsearch, Kibana, Filebeat) as native Kubernetes resources.
+    * `eck-stack`: This application deploys the actual logging cluster (likely **Elasticsearch** for storage/search and **Kibana** for visualization) using the `eck-stack` Helm chart. It runs in sync wave `1`, ensuring the operator is ready first.
+    * `filebeat-eck`: Deployed as a DaemonSet in wave `2`, **Filebeat** runs on every node to collect container logs. It's configured to send these logs directly to the Elasticsearch cluster managed by ECK.
+
+* **Ingress & Networking:**
+    * `aws-load-balancer-controller`: This deploys the **AWS Load Balancer Controller**, which is essential for running on EKS. It automatically provisions and manages AWS Application Load Balancers (ALBs) whenever a Kubernetes `Ingress` resource is created.
+
+* **My Application:**
+    * `my-website`: This is the primary application, my personal portfolio website. It's deployed from the `liormilliger/mywebsite-k8s` Git repository and runs in the final sync wave (`3`), ensuring all cluster services (monitoring, logging, ingress) are fully operational first.
 
 ## ⚙️ Helm Charts
 
